@@ -5,7 +5,8 @@ The primary coordinator, which derives from CoorindatorBase and adds methods for
 
 #include "coordinator/primary_nodelet.h"
 #include "coordinator/primary_tests.hpp"
-
+#include "ros/ros.h"
+//#include "std_msgs/Int32.h"
 /* ************************************************************************** */
 void PrimaryNodelet::Initialize(ros::NodeHandle* nh) {
   /**
@@ -62,6 +63,8 @@ void PrimaryNodelet::Initialize(ros::NodeHandle* nh) {
   std::cout << "[PRIMARY_COORD] Initialized." << std::endl;
   thread_.reset(new std::thread(&CoordinatorBase::Run, this, nh));
 }
+
+
 
 /* ************************************************************************** */
 void PrimaryNodelet::get_status_msg(coordinator::StatusPrimary& msg){

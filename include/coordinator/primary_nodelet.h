@@ -54,7 +54,7 @@ class PrimaryNodelet : public CoordinatorBase<coordinator::StatusPrimary>, publi
   void Initialize(ros::NodeHandle* nh);
   void load_params();
   void Run(ros::NodeHandle *nh);
-
+  //void PrimaryNodelet::test_num_callback(Int32 test_number);
   // quick checkout
   void RunTest0(ros::NodeHandle *nh) override;  // quick checkout
 

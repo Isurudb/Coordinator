@@ -37,7 +37,7 @@ Every test has a test#() function available in case it is needed by asap.py
 #include <coordinator/StatusPrimary.h>
 #include <coordinator/StatusSecondary.h>
 #include <coordinator/TestNumber.h>
-
+//#include <std_msgs/Int32.h>
 // Actions
 #include <ff_msgs/ControlAction.h>
 
@@ -50,7 +50,7 @@ Every test has a test#() function available in case it is needed by asap.py
 #include <fstream>
 #include <chrono>
 #include <string.h>
-
+#include <sstream>
 
 static std::string TOPIC_ASAP_STATUS = "asap/status";
 static std::string TOPIC_ASAP_TEST_NUMBER = "asap/test_number";
@@ -275,6 +275,7 @@ void CoordinatorBase<T>::test_num_callback(const coordinator::TestNumber::ConstP
     }
     pub_flight_mode_.publish(flight_mode_);
   }
+  ROS_INFO("It is working bro dont be sad ;) ");
 }
 
 

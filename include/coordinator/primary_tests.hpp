@@ -1,12 +1,18 @@
 #pragma once
 #include "coordinator/primary_nodelet.h"
+//#include "std_msgs/String.h"
+
+
 
 /************************************************************************/
 void PrimaryNodelet::RunTest0(ros::NodeHandle *nh){
     NODELET_INFO_STREAM("[PRIMARY_COORD]: Congratulations, you have passed quick checkout. " 
     "May your days be blessed with only warnings and no errors.");
+    
 
-    disable_default_ctl();
+    ROS_INFO("I is working bro dont be sad ");
+
+    // disable_default_ctl();
     ros::Duration(5.0).sleep();
 
     NODELET_DEBUG_STREAM("[PRIMARY COORD]: ...test complete!");
