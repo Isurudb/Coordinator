@@ -275,7 +275,7 @@ void CoordinatorBase<T>::test_num_callback(const coordinator::TestNumber::ConstP
     }
     pub_flight_mode_.publish(flight_mode_);
   }
-  ROS_INFO("It is working bro dont be sad ;) ");
+  // ROS_INFO("It is working bro dont be sad ;) ");
 }
 
 

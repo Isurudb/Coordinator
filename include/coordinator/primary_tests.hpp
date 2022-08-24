@@ -6,14 +6,25 @@
 
 /************************************************************************/
 void PrimaryNodelet::RunTest0(ros::NodeHandle *nh){
+    int system_ret;
+    std::string undock_command;
+     undock_command = "rosrun dock dock_tool -undock";
     NODELET_INFO_STREAM("[PRIMARY_COORD]: Congratulations, you have passed quick checkout. " 
     "May your days be blessed with only warnings and no errors.");
     
 
+    
+    ros::Duration(5.0).sleep();
+    ROS_INFO("Undocking the Astrobee ");
+    NODELET_INFO_STREAM("Calling " << undock_command);
+    system_ret = system(undock_command.c_str());
+
+    if(system_ret != 0){
+        NODELET_ERROR_STREAM("[PRIMARY/DMPC] Failed to Launch DMPC nodes.");
+    }
     ROS_INFO("Disabling the inbuilt controller ");
 
     disable_default_ctl();
-    ros::Duration(5.0).sleep();
 
     NODELET_DEBUG_STREAM("[PRIMARY COORD]: ...test complete!");
     base_status_.test_finished = true;
