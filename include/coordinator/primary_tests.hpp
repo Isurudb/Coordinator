@@ -10,9 +10,9 @@ void PrimaryNodelet::RunTest0(ros::NodeHandle *nh){
     "May your days be blessed with only warnings and no errors.");
     
 
-    ROS_INFO("I is working bro dont be sad ");
+    ROS_INFO("Disabling the inbuilt controller ");
 
-    // disable_default_ctl();
+    disable_default_ctl();
     ros::Duration(5.0).sleep();
 
     NODELET_DEBUG_STREAM("[PRIMARY COORD]: ...test complete!");
