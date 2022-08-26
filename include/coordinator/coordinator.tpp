@@ -34,6 +34,7 @@ Every test has a test#() function available in case it is needed by asap.py
 #include <geometry_msgs/PoseWithCovariance.h>
 #include <geometry_msgs/TwistWithCovariance.h>
 #include <geometry_msgs/Inertia.h>
+#include <geometry_msgs/Wrench.h>
 #include <coordinator/StatusPrimary.h>
 #include <coordinator/StatusSecondary.h>
 #include <coordinator/TestNumber.h>
@@ -54,6 +55,7 @@ Every test has a test#() function available in case it is needed by asap.py
 
 static std::string TOPIC_ASAP_STATUS = "asap/status";
 static std::string TOPIC_ASAP_TEST_NUMBER = "asap/test_number";
+static std::string TOPIC_GNC_CTL_CMD = "gnc/ctl/command";
 
 
 // base status struct (key information)
@@ -85,6 +87,7 @@ class CoordinatorBase {
 
   ros::Publisher pub_flight_mode_;
   ros::Publisher pub_status_;
+  ros::Publisher pub_ctl_;
 
   ros::Subscriber sub_flight_mode_;
   ros::Subscriber sub_ekf_;
@@ -97,6 +100,9 @@ class CoordinatorBase {
 
   ff_msgs::FlightMode flight_mode_;
   ff_msgs::EkfState ekf_state_;
+  ff_msgs::FamCommand gnc_setpoint;
+
+  geometry_msgs::Wrench ctl_input;
 
   // Parameters
   bool ground_ = false;  // whether or not this is a ground test
@@ -203,7 +209,7 @@ template <typename T>
 void CoordinatorBase<T>::get_flight_mode() {
   /* Get a nominal flight mode for desired test.
   */
-  if (base_status_.test_number != -1 and base_status_.test_number != 0) {  // NOT shutdown test number or checkout test
+  if (base_status_.test_number != -1 ) {  // NOT shutdown test number or checkout test {and base_status_.test_number != 0}
     // create a nominal FlightMode
     if (!ff_util::FlightUtil::GetFlightMode(flight_mode_, base_status_.flight_mode)) {
       return;
@@ -246,10 +252,10 @@ void CoordinatorBase<T>::process_test_number() {
 
     // Parameter settings xx(xxxxxx)
     // controller
-    if (test_number_str[2] == '1') {  // standard MPC
+    if (test_number_str[2] == '2') {  // standard MPC
       stored_control_mode_ = "track";
     }
-    else if (test_number_str[2] == '2') {  // tube MPC
+    else if (test_number_str[2] == '3') {  // tube MPC
       stored_control_mode_ = "track_tube";
     }
   }
