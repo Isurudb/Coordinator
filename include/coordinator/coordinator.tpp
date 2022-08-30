@@ -345,6 +345,7 @@ void CoordinatorBase<T>::ekf_callback(const ff_msgs::EkfState::ConstPtr msg) {
     x_real_complete_(14) = 0.0;
     x_real_complete_(15) = 0.0;
     }
+    ROS_INFO("qx: [%f]  qy: [%f] qz: [%f] qw: [%f]", qx,qy,qz,qw);
 }
 
 

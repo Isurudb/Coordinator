@@ -64,7 +64,7 @@ primary_status_.control_mode = "regulate";
         ctl_input.force.z=0.0;
         ctl_input.torque.x=0.0;
         ctl_input.torque.y=0.0;
-        ctl_input.torque.z=5;
+        ctl_input.torque.z=0.1;
 
         pub_ctl_.publish(gnc_setpoint);
         loop_rate.sleep();
