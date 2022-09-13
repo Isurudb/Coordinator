@@ -18,6 +18,8 @@ Every test has a test#() function available in case it is needed by asap.py
 #include <tf2/LinearMath/Transform.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 
+
+
 // FSW includes
 #include <ff_util/ff_nodelet.h>
 #include <ff_util/ff_names.h>
@@ -52,7 +54,7 @@ Every test has a test#() function available in case it is needed by asap.py
 #include <chrono>
 #include <string.h>
 #include <sstream>
-
+#include <math.h>
 static std::string TOPIC_ASAP_STATUS = "asap/status";
 static std::string TOPIC_ASAP_TEST_NUMBER = "asap/test_number";
 static std::string TOPIC_GNC_CTL_CMD = "gnc/ctl/command";
@@ -103,6 +105,9 @@ class CoordinatorBase {
   ff_msgs::FamCommand gnc_setpoint;
 
   geometry_msgs::Wrench ctl_input;
+  geometry_msgs::Quaternion attitude;
+  geometry_msgs::Vector3 omega,velocity_, position_, position_error, position_ref;
+  tf2::Quaternion attitude_,q_ref,q_e,q_ref_inv;
 
   // Parameters
   bool ground_ = false;  // whether or not this is a ground test
@@ -327,6 +332,19 @@ void CoordinatorBase<T>::ekf_callback(const ff_msgs::EkfState::ConstPtr msg) {
   float qz = msg->pose.orientation.z;
   float qw = msg->pose.orientation.w;
 
+  float px = msg->pose.position.x;
+  float py = msg->pose.position.y;
+  float pz = msg->pose.position.z;
+
+  float vx = msg->velocity.x;
+  float vy = msg->velocity.y;
+  float vz = msg->velocity.z;
+
+
+  float wx = msg->omega.x;
+  float wy = msg->omega.y;
+  float wz = msg->omega.z;
+
   if (qx != 0 || qy != 0 || qz != 0 || qw != 0) {
     x_real_complete_(0) = msg->pose.position.x;
     x_real_complete_(1) = msg->pose.position.y;
@@ -345,7 +363,41 @@ void CoordinatorBase<T>::ekf_callback(const ff_msgs::EkfState::ConstPtr msg) {
     x_real_complete_(14) = 0.0;
     x_real_complete_(15) = 0.0;
     }
-    ROS_INFO("qx: [%f]  qy: [%f] qz: [%f] qw: [%f]", qx,qy,qz,qw);
+    attitude.x=qx;
+    attitude.y=qy;
+    attitude.z=qz;
+    attitude.w=qw;
+    omega.x=wx;
+    omega.y=wy;
+    omega.z=wz;
+    geometry_msgs::Vector3 torque;
+    double r=0, p=0, y=0.5*3.14159;  // Rotate the previous pose by 180* about Z
+
+        q_ref.setRPY(r, p, y);
+        tf2::convert(attitude,attitude_);
+        q_ref_inv=q_ref.inverse();//
+  q_e= q_ref_inv*attitude_;  // Calculate the new orientation
+  q_e.normalize();
+
+
+    position_.x = px;
+    position_.y = py;
+    position_.z = pz;
+
+    position_ref.x = 10.8333388725;
+    position_ref.y = -9.41988714508+0.5;
+    position_ref.z = 4.20110343832; 
+
+
+    position_error.x = position_.x - position_ref.x;
+    position_error.y = position_.y - position_ref.y;
+    position_error.z = position_.z - position_ref.z;
+
+    velocity_.x=vx;
+    velocity_.y=vy;
+    velocity_.z=vz;
+
+    //ROS_INFO("qx: [%f]  qy: [%f] qz: [%f] qw: [%f]", attitude.x,attitude.y,attitude.z,attitude.x);
 }
 
 
