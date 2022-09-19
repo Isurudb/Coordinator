@@ -55,9 +55,78 @@ Every test has a test#() function available in case it is needed by asap.py
 #include <string.h>
 #include <sstream>
 #include <math.h>
+
+//mathlab code generation
+#include <stddef.h>
+#include <stdio.h>                // This ert_main.c example uses printf/fflush
+#include "controller1.h"               // Model's header file
+#include "rtwtypes.h"
+
+
+static controller1ModelClass controller1_Obj;// Instance of model class
+
+// '<Root>/x_e'
+static real_T arg_x_e = 0.0;
+
+// '<Root>/y_e'
+static real_T arg_y_e = 0.0;
+
+// '<Root>/z_e'
+static real_T arg_z_e = 0.0;
+
+// '<Root>/vx'
+static real_T arg_vx = 0.0;
+
+// '<Root>/vy'
+static real_T arg_vy = 0.0;
+
+// '<Root>/vz'
+static real_T arg_vz = 0.0;
+
+// '<Root>/qx'
+static real_T arg_qx = 0.0;
+
+// '<Root>/qy'
+static real_T arg_qy = 0.0;
+
+// '<Root>/qz'
+static real_T arg_qz = 0.0;
+
+// '<Root>/qw'
+static real_T arg_qw = 0.0;
+
+// '<Root>/omegax'
+static real_T arg_omegax = 0.0;
+
+// '<Root>/omegay'
+static real_T arg_omegay = 0.0;
+
+// '<Root>/omegaz'
+static real_T arg_omegaz = 0.0;
+
+// '<Root>/fx'
+static real_T arg_fx;
+
+// '<Root>/fy'
+static real_T arg_fy;
+
+// '<Root>/fz'
+static real_T arg_fz;
+
+// '<Root>/tau_x'
+static real_T arg_tau_x;
+
+// '<Root>/tau_y'
+static real_T arg_tau_y;
+
+// '<Root>/tau_z'
+static real_T arg_tau_z;
+
 static std::string TOPIC_ASAP_STATUS = "asap/status";
 static std::string TOPIC_ASAP_TEST_NUMBER = "asap/test_number";
 static std::string TOPIC_GNC_CTL_CMD = "gnc/ctl/command";
+
+
 
 
 // base status struct (key information)
@@ -138,6 +207,7 @@ class CoordinatorBase {
   void disable_default_ctl_callback(const ros::TimerEvent&);
   void disable_default_ctl();
   void enable_default_ctl();
+  void rt_OneStep();
 
   // Virtual test list: to be replaced on each derived coordinator
   virtual void RunTest0(ros::NodeHandle *nh) {};
@@ -397,7 +467,25 @@ void CoordinatorBase<T>::ekf_callback(const ff_msgs::EkfState::ConstPtr msg) {
     velocity_.y=vy;
     velocity_.z=vz;
 
-    //ROS_INFO("qx: [%f]  qy: [%f] qz: [%f] qw: [%f]", attitude.x,attitude.y,attitude.z,attitude.x);
+
+
+    arg_x_e = position_error.x;
+    arg_y_e = position_error.y;
+    arg_z_e = position_error.z;
+    arg_vx  = vx;
+    arg_vy  = vy;
+    arg_vz  = vz;
+    arg_qx = q_e.getX();
+    arg_qy = q_e.getY();
+    arg_qz = q_e.getZ();
+    arg_qw = q_e.getW();
+    arg_omegax = wx;
+    arg_omegay = wy;
+    arg_omegaz = wz;
+    
+    //rt_OneStep();
+
+    //ROS_INFO("fx: [%f]  fy: [%f] fz: [%f] tau_x: [%f] tau_y: [%f] tau_y: [%f]", arg_fx,arg_fy,arg_fz,arg_tau_x,arg_tau_y,arg_tau_z);
 }
 
 
@@ -409,6 +497,43 @@ void CoordinatorBase<T>::debug(){
    * 
    */
 
+}
+
+//void rt_OneStep(void);
+//void rt_OneStep(void)
+template<typename T>
+void CoordinatorBase<T>::rt_OneStep()
+{
+  static boolean_T OverrunFlag = false;
+
+  // Disable interrupts here
+
+  // Check for overrun
+  if (OverrunFlag) {
+    rtmSetErrorStatus(controller1_Obj.getRTM(), "Overrun");
+    return;
+  }
+
+  OverrunFlag = true;
+
+  // Save FPU context here (if necessary)
+  // Re-enable timer or interrupt here
+  // Set model inputs here
+
+  // Step the model
+  controller1_Obj.step(arg_x_e, arg_y_e, arg_z_e, arg_vx, arg_vy, arg_vz, arg_qx,
+                       arg_qy, arg_qz, arg_qw, arg_omegax, arg_omegay,
+                       arg_omegaz, &arg_fx, &arg_fy, &arg_fz, &arg_tau_x,
+                       &arg_tau_y, &arg_tau_z);
+
+  // Get model outputs here
+
+  // Indicate task complete
+  OverrunFlag = false;
+
+  // Disable interrupts here
+  // Restore FPU context here (if necessary)
+  // Enable interrupts here
 }
 
 
