@@ -56,71 +56,14 @@ Every test has a test#() function available in case it is needed by asap.py
 #include <sstream>
 #include <math.h>
 
-//mathlab code generation
+/* //mathlab code generation
 #include <stddef.h>
 #include <stdio.h>                // This ert_main.c example uses printf/fflush
 #include "controller1.h"               // Model's header file
-#include "rtwtypes.h"
+#include "rtwtypes.h" */
 
 
-static controller1ModelClass controller1_Obj;// Instance of model class
 
-// '<Root>/x_e'
-static real_T arg_x_e = 0.0;
-
-// '<Root>/y_e'
-static real_T arg_y_e = 0.0;
-
-// '<Root>/z_e'
-static real_T arg_z_e = 0.0;
-
-// '<Root>/vx'
-static real_T arg_vx = 0.0;
-
-// '<Root>/vy'
-static real_T arg_vy = 0.0;
-
-// '<Root>/vz'
-static real_T arg_vz = 0.0;
-
-// '<Root>/qx'
-static real_T arg_qx = 0.0;
-
-// '<Root>/qy'
-static real_T arg_qy = 0.0;
-
-// '<Root>/qz'
-static real_T arg_qz = 0.0;
-
-// '<Root>/qw'
-static real_T arg_qw = 0.0;
-
-// '<Root>/omegax'
-static real_T arg_omegax = 0.0;
-
-// '<Root>/omegay'
-static real_T arg_omegay = 0.0;
-
-// '<Root>/omegaz'
-static real_T arg_omegaz = 0.0;
-
-// '<Root>/fx'
-static real_T arg_fx;
-
-// '<Root>/fy'
-static real_T arg_fy;
-
-// '<Root>/fz'
-static real_T arg_fz;
-
-// '<Root>/tau_x'
-static real_T arg_tau_x;
-
-// '<Root>/tau_y'
-static real_T arg_tau_y;
-
-// '<Root>/tau_z'
-static real_T arg_tau_z;
 
 static std::string TOPIC_ASAP_STATUS = "asap/status";
 static std::string TOPIC_ASAP_TEST_NUMBER = "asap/test_number";
@@ -143,7 +86,8 @@ struct BaseStatus {
 
 
 template <typename T>  // for PrimaryStatus or SecondaryStatus 
-class CoordinatorBase {
+class CoordinatorBase 
+{
  public:
   CoordinatorBase() {}; // don't do anything ROS-related in the constructor!
   ~CoordinatorBase() {};
@@ -207,12 +151,74 @@ class CoordinatorBase {
   void disable_default_ctl_callback(const ros::TimerEvent&);
   void disable_default_ctl();
   void enable_default_ctl();
-  void rt_OneStep();
+  
 
   // Virtual test list: to be replaced on each derived coordinator
   virtual void RunTest0(ros::NodeHandle *nh) {};
   virtual void RunTest1(ros::NodeHandle *nh) {};
   virtual void RunTest2(ros::NodeHandle *nh) {};
+
+
+  //controller1ModelClass controller1_Obj;// Instance of model class
+
+// '<Root>/x_e'
+float arg_x_e = 0.0;
+
+// '<Root>/y_e'
+ float arg_y_e = 0.0;
+
+// '<Root>/z_e'
+ float arg_z_e = 0.0;
+
+// '<Root>/vx'
+ float arg_vx = 0.0;
+
+// '<Root>/vy'
+ float arg_vy = 0.0;
+
+// '<Root>/vz'
+ float arg_vz = 0.0;
+
+// '<Root>/qx'
+ float arg_qx = 0.0;
+
+// '<Root>/qy'
+ float arg_qy = 0.0;
+
+// '<Root>/qz'
+ float arg_qz = 0.0;
+
+// '<Root>/qw'
+ float arg_qw = 0.0;
+
+// '<Root>/omegax'
+ float arg_omegax = 0.0;
+
+// '<Root>/omegay'
+ float arg_omegay = 0.0;
+
+// '<Root>/omegaz'
+ float arg_omegaz = 0.0;
+
+// '<Root>/fx'
+ float arg_fx;
+
+// '<Root>/fy'
+ float arg_fy;
+
+// '<Root>/fz'
+ float arg_fz;
+
+// '<Root>/tau_x'
+ float arg_tau_x;
+
+// '<Root>/tau_y'
+ float arg_tau_y;
+
+// '<Root>/tau_z'
+ float arg_tau_z;
+
+void step_PID();
   // add test definitions as necessary here
   // you can add more tests as desired in primary.h and secondary.h
 };
@@ -469,23 +475,29 @@ void CoordinatorBase<T>::ekf_callback(const ff_msgs::EkfState::ConstPtr msg) {
 
 
 
-    arg_x_e = position_error.x;
-    arg_y_e = position_error.y;
-    arg_z_e = position_error.z;
-    arg_vx  = vx;
-    arg_vy  = vy;
-    arg_vz  = vz;
-    arg_qx = q_e.getX();
-    arg_qy = q_e.getY();
-    arg_qz = q_e.getZ();
-    arg_qw = q_e.getW();
-    arg_omegax = wx;
-    arg_omegay = wy;
-    arg_omegaz = wz;
-    
-    //rt_OneStep();
+     arg_x_e = position_error.x;
+     arg_y_e = position_error.y;
+     arg_z_e = position_error.z;
+     arg_vx  = vx;
+     arg_vy  = vy;
+     arg_vz  = vz;
+     arg_qx = q_e.getX();
+     arg_qy = q_e.getY();
+     arg_qz = q_e.getZ();
+     arg_qw = q_e.getW();
+     arg_omegax = wx;
+     arg_omegay = wy;
+     arg_omegaz = wz;
+    /* double *fx;
+    double *fy;
+    double *fz;
+    double *taux;
+    double *tauy;
+    double *tauz; */
+    step_PID();
+   // rt_OneStep();
 
-    //ROS_INFO("fx: [%f]  fy: [%f] fz: [%f] tau_x: [%f] tau_y: [%f] tau_y: [%f]", arg_fx,arg_fy,arg_fz,arg_tau_x,arg_tau_y,arg_tau_z);
+    ROS_INFO("fx: [%f]  fy: [%f] fz: [%f] tau_x: [%f] tau_y: [%f] tau_y: [%f]", arg_fx,arg_fy,arg_fz, arg_tau_x,arg_tau_y,arg_tau_z);
 }
 
 
@@ -499,9 +511,76 @@ void CoordinatorBase<T>::debug(){
 
 }
 
+
+template<typename T>
+void CoordinatorBase<T>::step_PID(){
+  /**
+   * @brief debug function call to test compatibility with other Bases
+   * 
+   */
+
+    float a[18] = { -4.0, -0.0, -0.0, -0.0, -4.0, -0.0, -0.0, -0.0,
+    -4.0, -2.828, -0.0, -0.0, -0.0, -2.828, -0.0, -0.0, -0.0, -2.828 };
+
+   float a_0[18] = { -0.612, -0.0, -0.0, -0.0, -0.572, -0.0, -0.0,
+    -0.0, -0.652, -0.43268399999999996, -0.0, -0.0, -0.0, -0.40440399999999993,
+    -0.0, -0.0, -0.0, -0.460964 };
+
+  float tmp[6];
+  float u[3];
+  float tau[3];
+  int i;
+  int i_0;
+  //UNUSED_PARAMETER(arg_qw);
+
+  // MATLAB Function: '<Root>/Position Controller' incorporates:
+  //   Inport: '<Root>/vx'
+  //   Inport: '<Root>/vy'
+  //   Inport: '<Root>/vz'
+  //   Inport: '<Root>/x_e'
+  //   Inport: '<Root>/y_e'
+  //   Inport: '<Root>/z_e'
+
+  tmp[0] = arg_x_e;
+  tmp[1] = arg_y_e;
+  tmp[2] = arg_z_e;
+  tmp[3] = arg_vx;
+  tmp[4] = arg_vy;
+  tmp[5] = arg_vz;
+  for (i = 0; i < 3; i++) {
+    u[i] = 0.0;
+    for (i_0 = 0; i_0 < 6; i_0++) {
+      u[i] += a[3 * i_0 + i] * tmp[i_0];
+    }
+  }
+
+
+  tmp[0] = arg_qx;
+  tmp[1] = arg_qy;
+  tmp[2] = arg_qz;
+  tmp[3] = arg_omegax;
+  tmp[4] = arg_omegay;
+  tmp[5] = arg_omegaz;
+  for (i = 0; i < 3; i++) {
+    tau[i] = 0.0;
+    for (i_0 = 0; i_0 < 6; i_0++) {
+      tau[i] += a_0[3 * i_0 + i] * tmp[i_0];
+    }
+  }
+ arg_fx=u[0];
+ arg_fy=u[1];
+ arg_fz=u[2];
+ arg_tau_x=tau[0];
+ arg_tau_y=tau[1];
+ arg_tau_z=tau[2];
+
+
+}
+
+
 //void rt_OneStep(void);
 //void rt_OneStep(void)
-template<typename T>
+/* template<typename T>
 void CoordinatorBase<T>::rt_OneStep()
 {
   static boolean_T OverrunFlag = false;
@@ -510,7 +589,7 @@ void CoordinatorBase<T>::rt_OneStep()
 
   // Check for overrun
   if (OverrunFlag) {
-    rtmSetErrorStatus(controller1_Obj.getRTM(), "Overrun");
+    rtmSetErrorStatus(controller1ModelClass::getRTM(), "Overrun");
     return;
   }
 
@@ -521,7 +600,7 @@ void CoordinatorBase<T>::rt_OneStep()
   // Set model inputs here
 
   // Step the model
-  controller1_Obj.step(arg_x_e, arg_y_e, arg_z_e, arg_vx, arg_vy, arg_vz, arg_qx,
+  controller1ModelClass::step(arg_x_e, arg_y_e, arg_z_e, arg_vx, arg_vy, arg_vz, arg_qx,
                        arg_qy, arg_qz, arg_qw, arg_omegax, arg_omegay,
                        arg_omegaz, &arg_fx, &arg_fy, &arg_fz, &arg_tau_x,
                        &arg_tau_y, &arg_tau_z);
@@ -534,7 +613,7 @@ void CoordinatorBase<T>::rt_OneStep()
   // Disable interrupts here
   // Restore FPU context here (if necessary)
   // Enable interrupts here
-}
+} */
 
 
 /* ************************************************************************** */

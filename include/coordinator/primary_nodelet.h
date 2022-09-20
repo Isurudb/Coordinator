@@ -1,6 +1,11 @@
 #pragma once
 #include "coordinator/coordinator.tpp"
-
+#include "coordinator/controller1.h"
+/* //mathlab code generation
+#include <stddef.h>
+#include <stdio.h>                // This ert_main.c example uses printf/fflush
+#include "controller1.h"               // Model's header file
+#include "rtwtypes.h" */
 // status struct for primary Astrobee
 struct primary_status_struct {
   std::string control_mode = "inactive";
@@ -8,12 +13,13 @@ struct primary_status_struct {
 };
 
 
-class PrimaryNodelet : public CoordinatorBase<coordinator::StatusPrimary>, public ff_util::FreeFlyerNodelet {
+class PrimaryNodelet : public CoordinatorBase<coordinator::StatusPrimary>, public ff_util::FreeFlyerNodelet{
  public:
   PrimaryNodelet(): ff_util::FreeFlyerNodelet(true) {}  // don't do anything ROS-related in the constructor! (call the Nodelet constructor)
   ~PrimaryNodelet() {};
 
  private:
+  //static controller1ModelClass controller1_Obj;// Instance of model class
   primary_status_struct primary_status_;
   std::string CONTROL_MODE_TOPIC = "reswarm/primary/control_mode";
 
