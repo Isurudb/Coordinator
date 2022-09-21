@@ -71,9 +71,9 @@ primary_status_.control_mode = "regulate";
         float R_32 = 2*(attitude.y*attitude.z + attitude.w*attitude.x);
         float R_33 = 2*(attitude.z*attitude.z + attitude.w*attitude.w)-1;
 
-        float u_x = -13.5*velocity_.x -0.85*position_error.x;
-        float u_y = -13.5*velocity_.y -0.85*position_error.y;
-        float u_z = -1.0*velocity_.z -0.1*position_error.z;
+        float u_x = arg_fx;//-13.5*velocity_.x -0.85*position_error.x;
+        float u_y = arg_fy;//-13.5*velocity_.y -0.85*position_error.y;
+        float u_z = arg_fz;//-1.0*velocity_.z -0.1*position_error.z;
 
 
 
@@ -102,9 +102,9 @@ primary_status_.control_mode = "regulate";
         gnc_setpoint.control_mode=2;
 
         
-        ctl_input.torque.x=-0.02*q_e.getX()-0.2*omega.x;
-        ctl_input.torque.y=-0.02*q_e.getY()-0.2*omega.y;
-        ctl_input.torque.z=-0.02*q_e.getZ()-0.2*omega.z;
+        ctl_input.torque.x=arg_tau_x;//-0.02*q_e.getX()-0.2*omega.x;
+        ctl_input.torque.y=arg_tau_y;//-0.02*q_e.getY()-0.2*omega.y;
+        ctl_input.torque.z=arg_tau_z;//-0.02*q_e.getZ()-0.2*omega.z;
 
         pub_ctl_.publish(gnc_setpoint);
         loop_rate.sleep();
