@@ -2,30 +2,20 @@
 // Academic License - for use in teaching, academic research, and meeting
 // course requirements at degree granting institutions only.  Not for
 // government, commercial, or other organizational use.
-// File: norm.h
+// File: MPC_Guidance_v3_sand_types.h
 //
 // MATLAB Coder version            : 5.1
-// C/C++ source code generated on  : 26-Sep-2022 17:35:01
+// C/C++ source code generated on  : 29-Sep-2022 00:21:21
 //
-#ifndef NORM_H
-#define NORM_H
+#ifndef MPC_GUIDANCE_V3_SAND_TYPES_H
+#define MPC_GUIDANCE_V3_SAND_TYPES_H
 
 // Include Files
 #include "rtwtypes.h"
-#include <cstddef>
-#include <cstdlib>
-
-// Function Declarations
-namespace coder
-{
-  double b_norm(const double x[2]);
-  double c_norm(const double x[3]);
-}
-
 #endif
 
 //
-// File trailer for norm.h
+// File trailer for MPC_Guidance_v3_sand_types.h
 //
 // [EOF]
 //

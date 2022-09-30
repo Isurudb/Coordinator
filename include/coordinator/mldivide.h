@@ -5,7 +5,7 @@
 // File: mldivide.h
 //
 // MATLAB Coder version            : 5.1
-// C/C++ source code generated on  : 26-Sep-2022 17:35:01
+// C/C++ source code generated on  : 29-Sep-2022 00:21:21
 //
 #ifndef MLDIVIDE_H
 #define MLDIVIDE_H
@@ -16,7 +16,7 @@
 #include <cstdlib>
 
 // Function Declarations
-namespace coder
+namespace MPC
 {
   void mldivide(const double A[3600], double B[60]);
 }

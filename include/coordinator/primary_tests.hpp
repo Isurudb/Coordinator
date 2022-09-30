@@ -71,9 +71,9 @@ primary_status_.control_mode = "regulate";
         float R_32 = 2*(attitude.y*attitude.z + attitude.w*attitude.x);
         float R_33 = 2*(attitude.z*attitude.z + attitude.w*attitude.w)-1;
 
-        float u_x = arg_fx;//-13.5*velocity_.x -0.85*position_error.x;
-        float u_y = arg_fy;//-13.5*velocity_.y -0.85*position_error.y;
-        float u_z = arg_fz;//-1.0*velocity_.z -0.1*position_error.z;
+        float u_x = Fx;//arg_fx;//-13.5*velocity_.x -0.85*position_error.x;
+        float u_y = Fy;//arg_fy;//-13.5*velocity_.y -0.85*position_error.y;
+        float u_z = Fz;//arg_fz;//-1.0*velocity_.z -0.1*position_error.z;
 
 
 
