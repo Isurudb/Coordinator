@@ -237,6 +237,14 @@ double X_QP[60]={0};
 double pt_sel;
 double dr;
 
+double z_nominal[6];
+double zp_nextNominal[6];
+double v_mpc[3];
+bool initial_run = true;
+
+double kn_tilda[3];
+double kN[3];
+bool rotation_done = false;
 void step_PID();
 
 // Function Declarations
@@ -244,6 +252,8 @@ void main_MPC_Guidance_v3_sand();
 void MPC_Guidance_v3_sand();
 void mldivide(double A[3600], double B[60]);
 bool rtIsNaN(double value);
+void nominal_dynamics();
+void tubing_mpc();
   // add test definitions as necessary here
   // you can add more tests as desired in primary.h and secondary.h
 };
@@ -527,8 +537,48 @@ void CoordinatorBase<T>::ekf_callback(const ff_msgs::EkfState::ConstPtr msg) {
     x0[4]=vy;
     x0[5]=vz;
     main_MPC_Guidance_v3_sand();
+    if (sqrt(q_e.getX()*q_e.getX()+q_e.getY()*q_e.getY()+q_e.getZ()*q_e.getZ())>0.05){
+      z_nominal[0]=x0[0];
+      z_nominal[1]=x0[1];
+      z_nominal[2]=x0[2];
+      z_nominal[3]=x0[3];
+      z_nominal[4]=x0[4];
+      z_nominal[5]=x0[5];
+
+      initial_run=false;
+
+
+    }
+    else{
+      z_nominal[0]=zp_nextNominal[0];
+      z_nominal[1]=zp_nextNominal[1];
+      z_nominal[2]=zp_nextNominal[2];
+      z_nominal[3]=zp_nextNominal[3];
+      z_nominal[4]=zp_nextNominal[4];
+      z_nominal[5]=zp_nextNominal[5];
+
+
+    }
+
+    v_mpc[0]=Fx;
+    v_mpc[1]=Fy;
+    v_mpc[2]=Fz;
+    nominal_dynamics();
+    kn_tilda[0]=Fx;
+    kn_tilda[1]=Fy;
+    kn_tilda[2]=Fz;
+
+      double sx=x0[0]-zp_nextNominal[0];
+      double sy=x0[1]-zp_nextNominal[1];
+      double sz=x0[2]-zp_nextNominal[2];
+      double svx=x0[3]-zp_nextNominal[3];
+      double svy=x0[4]-zp_nextNominal[4];
+      double svz=x0[5]-zp_nextNominal[5];
+
+    tubing_mpc();
     //X_QP=X_Qp
    // rt_OneStep();
+   //ROS_INFO("ex: [%f]  ey: [%f] ez: [%f] ev_x: [%f] ev_y: [%f] ev_z: [%f]", sx,sy,sz,svx,svy,svz);
 
    // ROS_INFO("fx: [%f]  fy: [%f] fz: [%f] tau_x: [%f] tau_y: [%f] tau_y: [%f]", Fx,Fy,Fz, arg_tau_x,arg_tau_y,arg_tau_z);
 }
@@ -543,7 +593,64 @@ void CoordinatorBase<T>::debug(){
    */
 
 }
+/* *************************************************************************** */
+template<typename T>
+void CoordinatorBase<T>::tubing_mpc(){
+  double a[18] = { 0.95998, 0.0, 0.0, 0.0, 0.95998, 0.0, 0.0, 0.0,
+    0.95998, 1.9433, 0.0, 0.0, 0.0, 1.9433, 0.0, 0.0, 0.0, 1.9433 };
+  double b_x[6];
+  double d;
 
+  if (((kn_tilda[0] == 0.0) && (kn_tilda[1] == 0.0)) && (kn_tilda[2] == 0.0)) {
+    kN[0] = 0.0;
+    kN[1] = 0.0;
+    kN[2] = 0.0;
+  } else {
+    int i;
+    for (i = 0; i < 6; i++) {
+      b_x[i] = x0[i] - z_nominal[i];
+    }
+
+    for (i = 0; i < 3; i++) {
+      d = 0.0;
+      for (int i1 = 0; i1 < 6; i1++) {
+        d += a[i + (3 * i1)] * b_x[i1];
+      }
+
+      kN[i] = kn_tilda[i] - d;
+    }
+  }
+
+
+
+}
+/* **************************************************************************** */
+template<typename T>
+void CoordinatorBase<T>::nominal_dynamics(){
+   double b_a[36] = { 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0,
+    0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.016, 0.0, 0.0, 1.0, 0.0, 0.0,
+    0.0, 0.016, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.016, 0.0, 0.0, 1.0 };
+
+   double a[18] = { 1.3361E-5, 0.0, 0.0, 0.0016701, 0.0, 0.0, 0.0,
+    1.3361E-5, 0.0, 0.0, 0.0016701, 0.0, 0.0, 0.0, 1.3361E-5, 0.0, 0.0,
+    0.0016701 };
+
+   double d;
+
+  // MPCParams.A;
+  // MPCParams.B;
+  for (int i = 0; i < 6; i++) {
+    d = 0.0;
+    for (int i1 = 0; i1 < 6; i1++) {
+      d += b_a[i + (6 * i1)] * z_nominal[i1];
+    }
+
+    zp_nextNominal[i] = d + (((a[i] * v_mpc[0]) + (a[i + 6] * v_mpc[1])) + (a[i + 12] * v_mpc[2]));
+  }
+
+
+
+}
 
 template<typename T>
 void CoordinatorBase<T>::step_PID(){

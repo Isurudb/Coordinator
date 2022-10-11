@@ -71,18 +71,19 @@ primary_status_.control_mode = "regulate";
         float R_32 = 2*(attitude.y*attitude.z + attitude.w*attitude.x);
         float R_33 = 2*(attitude.z*attitude.z + attitude.w*attitude.w)-1;
 
-        float u_x = Fx;//arg_fx;//-13.5*velocity_.x -0.85*position_error.x;
-        float u_y = Fy;//arg_fy;//-13.5*velocity_.y -0.85*position_error.y;
-        float u_z = Fz;//arg_fz;//-1.0*velocity_.z -0.1*position_error.z;
+        float u_x = kN[0];//Fx;//arg_fx;//-13.5*velocity_.x -0.85*position_error.x;
+        float u_y = kN[1];//]Fy;//arg_fy;//-13.5*velocity_.y -0.85*position_error.y;
+        float u_z = kN[2];//Fz;//arg_fz;//-1.0*velocity_.z -0.1*position_error.z;
 
 
 
-        if (sqrt(q_e.getX()*q_e.getX()+q_e.getY()*q_e.getY()+q_e.getZ()*q_e.getZ())<0.05)
+        if (rotation_done)
         {
-            ROS_INFO(" Attained the pose and initiating  PD for transverse motion  ex: [%f]  ey: [%f] ez: [%f]",position_error.x, position_error.y, position_error.z);
+            ROS_INFO(" Deploying TRMPC for transverse motion  ex: [%f]  ey: [%f] ez: [%f]",position_error.x, position_error.y, position_error.z);
             ctl_input.force.x = u_x*R_11 + u_y*R_21 + u_z*R_31;//-0.05*velocity_.x +0.005*position_error.x;
             ctl_input.force.y = u_x*R_12 + u_y*R_22 + u_z*R_32;//-0.05*velocity_.y -0.005*position_error.y;
             ctl_input.force.z = u_x*R_13 + u_y*R_23 + u_z*R_33;//-0.05*velocity_.z +0.005*position_error.z;
+           
         }
         else
         {
@@ -90,7 +91,10 @@ primary_status_.control_mode = "regulate";
             ctl_input.force.y=0;//-0.05*velocity_.y ;
             ctl_input.force.z=0;//-0.05*velocity_.z ;
         }
-        
+         if (sqrt(q_e.getX()*q_e.getX()+q_e.getY()*q_e.getY()+q_e.getZ()*q_e.getZ())<0.05){
+                rotation_done = true;
+         }
+            
         
         //ROS_INFO("qx: [%f]  qy: [%f] qz: [%f] qw: [%f]", q_e.getX()*q_e.getX(),q_e.getY()*q_e.getY(),q_e.getZ()*q_e.getZ(),q_e.getW());
 
