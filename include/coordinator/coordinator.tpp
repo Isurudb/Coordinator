@@ -241,6 +241,7 @@ double z_nominal[6];
 double zp_nextNominal[6];
 double v_mpc[3];
 bool initial_run = true;
+bool initialzation = false;
 
 double kn_tilda[3];
 double kN[3];
@@ -495,11 +496,11 @@ void CoordinatorBase<T>::ekf_callback(const ff_msgs::EkfState::ConstPtr msg) {
     position_.y = py;
     position_.z = pz;
 
-    position_ref.x = 10.8333388725;
+    /* position_ref.x = 10.8333388725;
     position_ref.y = -9.41988714508+0.5;
-    position_ref.z = 4.20110343832; 
+    position_ref.z = 4.20110343832;  */
 
-
+  if(initialzation){
     position_error.x = position_.x - position_ref.x;
     position_error.y = position_.y - position_ref.y;
     position_error.z = position_.z - position_ref.z;
@@ -508,7 +509,7 @@ void CoordinatorBase<T>::ekf_callback(const ff_msgs::EkfState::ConstPtr msg) {
     velocity_.y=vy;
     velocity_.z=vz;
 
-
+  
 
      arg_x_e = position_error.x;
      arg_y_e = position_error.y;
@@ -581,6 +582,7 @@ void CoordinatorBase<T>::ekf_callback(const ff_msgs::EkfState::ConstPtr msg) {
    //ROS_INFO("ex: [%f]  ey: [%f] ez: [%f] ev_x: [%f] ev_y: [%f] ev_z: [%f]", sx,sy,sz,svx,svy,svz);
 
    // ROS_INFO("fx: [%f]  fy: [%f] fz: [%f] tau_x: [%f] tau_y: [%f] tau_y: [%f]", Fx,Fy,Fz, arg_tau_x,arg_tau_y,arg_tau_z);
+  }
 }
 
 
