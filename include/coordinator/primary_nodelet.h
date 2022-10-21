@@ -67,6 +67,9 @@ class PrimaryNodelet : public CoordinatorBase<coordinator::StatusPrimary>, publi
   // Test list (overrides coordinator empty tests---add as desired!)
   void RunTest1(ros::NodeHandle *nh) override;  // a very simple test
    
+  // Isuru Basnayake
+  void RunTest2(ros::NodeHandle *nh) override;  
+
   void check_regulate();
   void publish_dummy_uc_bound();
 
