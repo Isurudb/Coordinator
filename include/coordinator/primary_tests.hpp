@@ -15,16 +15,16 @@ void PrimaryNodelet::RunTest0(ros::NodeHandle *nh){
 
     
     ros::Duration(5.0).sleep();
-    ROS_INFO("Undocking the Astrobee ");
+    /* ROS_INFO("Undocking the Astrobee ");
     NODELET_INFO_STREAM("Calling " << undock_command);
-    system_ret = system(undock_command.c_str());
+    system_ret = system(undock_command.c_str()); */
 
     if(system_ret != 0){
         NODELET_ERROR_STREAM("[PRIMARY/DMPC] Failed to Launch DMPC nodes.");
     }
     ROS_INFO("Initializing the position data....");
     position_ref.x = position_.x+0.3;
-    position_ref.y =  position_.y+1.0;
+    position_ref.y =  position_.y+0.35;
     position_ref.z =  position_.z+0.05;
     initialzation=true;
 
