@@ -23,8 +23,8 @@ void PrimaryNodelet::RunTest0(ros::NodeHandle *nh){
         NODELET_ERROR_STREAM("[PRIMARY/DMPC] Failed to Launch DMPC nodes.");
     }
     ROS_INFO("Initializing the position data....");
-    position_ref.x = position_.x+0.70;
-    position_ref.y =  position_.y+0.70;
+    position_ref.x = position_.x+0.35;
+    position_ref.y =  position_.y+0.35;
     position_ref.z =  position_.z+0.00;
     initialzation=true;
 
@@ -32,7 +32,7 @@ void PrimaryNodelet::RunTest0(ros::NodeHandle *nh){
 
     ROS_INFO("End of initialization............. <<< Test 0 >>> ..............");
 
-    //disable_default_ctl();
+   // disable_default_ctl();
     //check_regulate();  // check regulation until satisfied
     //ROS_INFO("Setting up the publisher ");
 
@@ -176,7 +176,8 @@ primary_status_.control_mode = "regulate";
 
         if (rotation_done)
         {
-            ROS_INFO(" Deploying LMPC for transverse motion  ex: [%f]  ey: [%f] ez: [%f]",position_error.x, position_error.y, position_error.z);
+            ROS_INFO(" Deploying LMPC for transverse motion  ex: [%f]  ey: [%f] ez: [%f] \n Fx: [%f] Fy: [%f] Fz: [%f]",
+            position_error.x, position_error.y, position_error.z,X_QP[0],X_QP[1],X_QP[2]);
             ctl_input.force.x = u_x*R_11 + u_y*R_21 + u_z*R_31;//-0.05*velocity_.x +0.005*position_error.x;
             ctl_input.force.y = u_x*R_12 + u_y*R_22 + u_z*R_32;//-0.05*velocity_.y -0.005*position_error.y;
             ctl_input.force.z = u_x*R_13 + u_y*R_23 + u_z*R_33;//-0.05*velocity_.z +0.005*position_error.z;
