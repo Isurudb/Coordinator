@@ -706,7 +706,7 @@ void CoordinatorBase<T>::step_PID(){
   }
 
 
-  tmp[0] = arg_qx;
+ /*  tmp[0] = arg_qx;
   tmp[1] = arg_qy;
   tmp[2] = arg_qz;
   tmp[3] = arg_omegax;
@@ -717,13 +717,78 @@ void CoordinatorBase<T>::step_PID(){
     for (i_0 = 0; i_0 < 6; i_0++) {
       tau[i] += a_0[3 * i_0 + i] * tmp[i_0];
     }
-  }
+  } */
  arg_fx=u[0];
  arg_fy=u[1];
  arg_fz=u[2];
- arg_tau_x=tau[0];
- arg_tau_y=tau[1];
- arg_tau_z=tau[2];
+
+
+ double qw = arg_qx;
+ double qx = arg_qx;
+ double qy = arg_qy;
+ double qz = arg_qz;
+ double fx = Fx; 
+ double fy = Fy;
+ double fz = Fz;
+
+ double a_1[18] = { -0.003068559900000001, -0.0, -0.0, -0.0,
+    -0.07183028100000001, -0.0, -0.0, -0.0, -0.072222055180000008, -0.153427995,
+    -0.0, -0.0, -0.0, -3.59151405, -0.0, -0.0, -0.0, -3.611102759 };
+
+  double dv[9];
+  double b_qx[6];
+  double U_body[3];
+  double b_fx[3];
+  double d;
+  double d1;
+  double d2;
+  double d3;
+  double d4;
+
+  //  Distance between two Astrobee com
+  //  =2*0.153427995 Ixx of compund object
+  // =2*0.14271405+m*d^2 Iyy of compund object
+  // =2*0.162302759+m*d^2 Izz of compund object
+  // 1
+  d = qw * qw;
+  dv[0] = (2.0 * (d + (qx * qx))) - 1.0;
+  d1 = qx * qy;
+  d2 = qw * qz;
+  dv[3] = 2.0 * (d1 - d2);
+  d3 = qx * qz;
+  d4 = qw * qy;
+  dv[6] = 2.0 * (d3 + d4);
+  dv[1] = 2.0 * (d1 + d2);
+  dv[4] = (2.0 * (d + (qy * qy))) - 1.0;
+  d1 = qy * qz;
+  d2 = qw * qx;
+  dv[7] = 2.0 * (d1 - d2);
+  dv[2] = 2.0 * (d3 - d4);
+  dv[5] = 2.0 * (d1 + d2);
+  dv[8] = (2.0 * (d + (qz * qz))) - 1.0;
+  b_qx[0] = qx;
+  b_qx[1] = qy;
+  b_qx[2] = qz;
+  b_qx[3] = arg_omegax;
+  b_qx[4] = arg_omegay;
+  b_qx[5] = arg_omegaz;
+  for (int32_T i = 0; i < 3; i++) {
+    U_body[i] = ((dv[i] * fx) + (dv[i + 3] * fy)) + (dv[i + 6] * fz);
+    d = 0.0;
+    for (int32_T i1 = 0; i1 < 6; i1++) {
+      d += a_1[i + (3 * i1)] * b_qx[i1];
+    }
+
+    b_fx[i] = d;
+  }
+
+  /* *tau_x = b_fx[0];
+  *tau_y = b_fx[1] - (-0.3 * U_body[2]);
+  *tau_z = b_fx[2] - (0.3 * U_body[1]); */
+
+ arg_tau_x = b_fx[0];
+ arg_tau_y = b_fx[1] - (-0.3 * U_body[2]);
+ arg_tau_z = b_fx[2] - (0.3 * U_body[1]);
 
 
 }
