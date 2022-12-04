@@ -483,18 +483,31 @@ void CoordinatorBase<T>::ekf_callback(const ff_msgs::EkfState::ConstPtr msg) {
     omega.y=wy;
     omega.z=wz;
     geometry_msgs::Vector3 torque;
-    double r=0, p=0, y=0;  // Rotate the previous pose by 180* about Z
+    double r=0, p=0, y=45;  // Rotate the previous pose by 45* about Z
 
         q_ref.setRPY(r, p, y);
         tf2::convert(attitude,attitude_);
         q_ref_inv=q_ref.inverse();//
   q_e= q_ref_inv*attitude_;  // Calculate the new orientation
   q_e.normalize();
+        float R_11 = 2*(attitude.x*attitude.x + attitude.w*attitude.w)-1;
+        float R_12 = 2*(attitude.x*attitude.y - attitude.w*attitude.z);
+        float R_13 = 2*(attitude.x*attitude.z + attitude.w*attitude.y); 
+        float R_21 = 2*(attitude.x*attitude.y + attitude.w*attitude.z);
+        float R_22 = 2*(attitude.y*attitude.y + attitude.w*attitude.w)-1;
+        float R_23 = 2*(attitude.y*attitude.z - attitude.w*attitude.x);
+        float R_31 = 2*(attitude.x*attitude.z - attitude.w*attitude.y); 
+        float R_32 = 2*(attitude.y*attitude.z + attitude.w*attitude.x);
+        float R_33 = 2*(attitude.z*attitude.z + attitude.w*attitude.w)-1;
+        
+        float cm_x =-0.3;
+        float cm_y =0.0;
+        float cm_z =0.0;
 
 
-    position_.x = px;
-    position_.y = py;
-    position_.z = pz;
+    position_.x = px + (cm_x*R_11 + cm_y*R_21 + cm_z*R_31);
+    position_.y = py + (cm_x*R_12 + cm_y*R_22 + cm_z*R_32);
+    position_.z = pz + (cm_x*R_13 + cm_y*R_23 + cm_z*R_33);
 
     /* position_ref.x = 10.8333388725;
     position_ref.y = -9.41988714508+0.5;
