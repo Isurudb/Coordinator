@@ -23,9 +23,15 @@ void PrimaryNodelet::RunTest0(ros::NodeHandle *nh){
         NODELET_ERROR_STREAM("[PRIMARY/DMPC] Failed to Launch DMPC nodes.");
     }
     ROS_INFO("Initializing the position data....");
-    position_ref.x = position_.x+0.35;
-    position_ref.y =  position_.y+0.35;
+    position_ref.x = position_.x-0.35;
+    position_ref.y =  position_.y-0.35;
     position_ref.z =  position_.z+0.00;
+   /*  z_nominal[0]=x0[0];
+      z_nominal[1]=x0[1];
+      z_nominal[2]=x0[2];
+      z_nominal[3]=x0[3];
+      z_nominal[4]=x0[4];
+      z_nominal[5]=x0[5]; */
     initialzation=true;
 
     ROS_INFO("Position data successfully initialized!");
