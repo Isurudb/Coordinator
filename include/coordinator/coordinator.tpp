@@ -4681,7 +4681,7 @@ void CoordinatorBase<T>::MPC_Guidance_v3_sand()
     }
 
     H[b_i] = d;
-    X_QP[b_i] = dv[b_i];
+    //X_QP[b_i] = dv[b_i];
   }
 
   //  Solve quadratic programming problem using Wright's (1997) Method
