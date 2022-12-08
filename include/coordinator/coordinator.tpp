@@ -243,13 +243,15 @@ double v_mpc[3];
 bool initial_run = true;
 bool initialzation = false;
 
+int count=0;
+
 double kn_tilda[3];
 double kN[3];
 bool rotation_done = false;
 void step_PID();
 
 // Function Declarations
-void main_MPC_Guidance_v3_sand();
+//void main_MPC_Guidance_v3_sand();
 void MPC_Guidance_v3_sand();
 void mldivide(double A[3600], double B[60]);
 bool rtIsNaN(double value);
@@ -505,9 +507,9 @@ void CoordinatorBase<T>::ekf_callback(const ff_msgs::EkfState::ConstPtr msg) {
         float cm_z =0.0;
 
 
-    position_.x = px + (cm_x*R_11 + cm_y*R_21 + cm_z*R_31);
-    position_.y = py + (cm_x*R_12 + cm_y*R_22 + cm_z*R_32);
-    position_.z = pz + (cm_x*R_13 + cm_y*R_23 + cm_z*R_33);
+    position_.x = px ;//+ (cm_x*R_11 + cm_y*R_21 + cm_z*R_31);
+    position_.y = py ;//+ (cm_x*R_12 + cm_y*R_22 + cm_z*R_32);
+    position_.z = pz ;//+ (cm_x*R_13 + cm_y*R_23 + cm_z*R_33);
 
     /* position_ref.x = 10.8333388725;
     position_ref.y = -9.41988714508+0.5;
@@ -550,8 +552,13 @@ void CoordinatorBase<T>::ekf_callback(const ff_msgs::EkfState::ConstPtr msg) {
     x0[3]=vx;
     x0[4]=vy;
     x0[5]=vz;
-    main_MPC_Guidance_v3_sand();
-    if (sqrt(q_e.getX()*q_e.getX()+q_e.getY()*q_e.getY()+q_e.getZ()*q_e.getZ())>0.005){
+    MPC_Guidance_v3_sand();
+    v_mpc[0]=Fx;
+    v_mpc[1]=Fy;
+    v_mpc[2]=Fz;
+    nominal_dynamics();
+    //sqrt(q_e.getX()*q_e.getX()+q_e.getY()*q_e.getY()+q_e.getZ()*q_e.getZ())>0.005
+    if (count==0){
       z_nominal[0]=x0[0];
       z_nominal[1]=x0[1];
       z_nominal[2]=x0[2];
@@ -574,22 +581,24 @@ void CoordinatorBase<T>::ekf_callback(const ff_msgs::EkfState::ConstPtr msg) {
 
     }
 
-    v_mpc[0]=Fx;
-    v_mpc[1]=Fy;
-    v_mpc[2]=Fz;
-    nominal_dynamics();
+    
     kn_tilda[0]=Fx;
     kn_tilda[1]=Fy;
     kn_tilda[2]=Fz;
 
-      double sx=x0[0]-zp_nextNominal[0];
+      /* double sx=x0[0]-zp_nextNominal[0];
       double sy=x0[1]-zp_nextNominal[1];
       double sz=x0[2]-zp_nextNominal[2];
       double svx=x0[3]-zp_nextNominal[3];
       double svy=x0[4]-zp_nextNominal[4];
-      double svz=x0[5]-zp_nextNominal[5];
+      double svz=x0[5]-zp_nextNominal[5]; */
 
     tubing_mpc();
+    count+=1;
+    if (count==101){
+
+      count =0;
+    }
     //X_QP=X_Qp
    // rt_OneStep();
    //ROS_INFO("ex: [%f]  ey: [%f] ez: [%f] ev_x: [%f] ev_y: [%f] ev_z: [%f]", sx,sy,sz,svx,svy,svz);
@@ -931,8 +940,8 @@ void CoordinatorBase<T>::enable_default_ctl() {
 }
 
 
-template<typename T>
-void CoordinatorBase<T>::main_MPC_Guidance_v3_sand()
+//template<typename T>
+/* void CoordinatorBase<T>::main_MPC_Guidance_v3_sand()
 {
 
   // Initialize function 'MPC_Guidance_v3_sand' input arguments.
@@ -940,7 +949,7 @@ void CoordinatorBase<T>::main_MPC_Guidance_v3_sand()
   // Call the entry-point 'MPC_Guidance_v3_sand'.
   
   MPC_Guidance_v3_sand();
-}
+} */
 
 
 template<typename T>
