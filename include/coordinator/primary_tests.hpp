@@ -23,8 +23,8 @@ void PrimaryNodelet::RunTest0(ros::NodeHandle *nh){
         NODELET_ERROR_STREAM("[PRIMARY/DMPC] Failed to Launch DMPC nodes.");
     }
     ROS_INFO("Initializing the position data....");
-    position_ref.x = 0.7;
-    position_ref.y = -0.7;
+    position_ref.x = 0.3;
+    position_ref.y = -0.3;
     position_ref.z = +0.00;
    /*  z_nominal[0]=x0[0];
       z_nominal[1]=x0[1];
@@ -196,9 +196,11 @@ primary_status_.control_mode = "regulate";
         }
         else
         {
-            ctl_input.force.x=0;//-0.05*velocity_.x ;
-            ctl_input.force.y=0;//-0.05*velocity_.y ;
-            ctl_input.force.z=0;//-0.05*velocity_.z ;
+             ROS_INFO(" Deploying LMPC for transverse motion  ex: [%f]  ey: [%f] ez: [%f] \n Fx: [%f] Fy: [%f] Fz: [%f]",
+            position_error.x, position_error.y, position_error.z,X_QP[0],X_QP[1],X_QP[2]);
+            ctl_input.force.x = u_x*R_11 + u_y*R_21 + u_z*R_31;//-0.05*velocity_.x +0.005*position_error.x;
+            ctl_input.force.y = u_x*R_12 + u_y*R_22 + u_z*R_32;//-0.05*velocity_.y -0.005*position_error.y;
+            ctl_input.force.z = u_x*R_13 + u_y*R_23 + u_z*R_33;//-0.05*velocity_.z +0.005*position_error.z;
         }
          if (sqrt(q_e.getX()*q_e.getX()+q_e.getY()*q_e.getY()+q_e.getZ()*q_e.getZ())<0.05){
                 rotation_done = true;
