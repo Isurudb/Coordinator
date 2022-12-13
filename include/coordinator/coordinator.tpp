@@ -483,7 +483,7 @@ void CoordinatorBase<T>::ekf_callback(const ff_msgs::EkfState::ConstPtr msg) {
     omega.y=wy;
     omega.z=wz;
     geometry_msgs::Vector3 torque;
-    double r=0, p=0, y=225;  // Rotate the previous pose by 45* about Z
+    double r=0, p=0, y=-3.1459/4;  // Rotate the previous pose by 45* about Z
 
         q_ref.setRPY(r, p, y);
         tf2::convert(attitude,attitude_);
@@ -505,9 +505,9 @@ void CoordinatorBase<T>::ekf_callback(const ff_msgs::EkfState::ConstPtr msg) {
         float cm_z =0.0;
 
 
-    position_.x = px + (cm_x*R_11 + cm_y*R_21 + cm_z*R_31);
-    position_.y = py + (cm_x*R_12 + cm_y*R_22 + cm_z*R_32);
-    position_.z = pz + (cm_x*R_13 + cm_y*R_23 + cm_z*R_33);
+    position_.x = px ;//+ (cm_x*R_11 + cm_y*R_21 + cm_z*R_31);
+    position_.y = py ;//+ (cm_x*R_12 + cm_y*R_22 + cm_z*R_32);
+    position_.z = pz ;//+ (cm_x*R_13 + cm_y*R_23 + cm_z*R_33);
 
     /* position_ref.x = 10.8333388725;
     position_ref.y = -9.41988714508+0.5;
