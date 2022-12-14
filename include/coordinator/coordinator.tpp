@@ -483,7 +483,7 @@ void CoordinatorBase<T>::ekf_callback(const ff_msgs::EkfState::ConstPtr msg) {
     omega.y=wy;
     omega.z=wz;
     geometry_msgs::Vector3 torque;
-    double r=0, p=0, y=0;  // Rotate the previous pose by 180* about Z
+    double r=0, p=0, y=-1*3.1457/4;  // Rotate the previous pose by 180* about Z
 
         q_ref.setRPY(r, p, y);
         tf2::convert(attitude,attitude_);
