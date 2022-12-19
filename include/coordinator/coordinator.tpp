@@ -236,6 +236,12 @@ double num_iter;
 double X_QP[60]={0};
 double pt_sel;
 double dr;
+double inti_e_x=0;
+double inti_e_y=0;
+double inti_e_z=0;
+float q0_x = 0;
+float q0_y = 0;
+float q0_z = 0;
 
 double z_nominal[6];
 double zp_nextNominal[6];
@@ -297,6 +303,9 @@ void CoordinatorBase<T>::Run(ros::NodeHandle *nh) {
 
   // (2) Publish default flight mode so FAM will actually perform actuation
   get_flight_mode();
+  
+  uint  speed_ =3;
+  flight_mode_.speed=3;
   pub_flight_mode_.publish(flight_mode_);  // TODO: should this be a more aggressive flight mode?
   ros::Duration(2.0).sleep();  // Pause so flight mode actually gets registered
 
@@ -374,7 +383,7 @@ void CoordinatorBase<T>::process_test_number() {
     if (test_number_str[2] == '2') {  // standard MPC
       stored_control_mode_ = "track";
     }
-    else if (test_number_str[2] == '3') {  // tube MPC
+    else if (test_number_str[2] == '1') {  // tube MPC
       stored_control_mode_ = "track_tube";
     }
   }
@@ -477,6 +486,23 @@ void CoordinatorBase<T>::ekf_callback(const ff_msgs::EkfState::ConstPtr msg) {
     x_real_complete_(14) = 0.0;
     x_real_complete_(15) = 0.0;
     }
+    double prod_val;
+    prod_val=qx*q0_x + qy*q0_y + qz*q0_z;
+    double deno;
+    deno=sqrt(prod_val*prod_val);
+    if ((prod_val==0)){
+    deno=1;
+    }
+    if(prod_val/deno <-0.9 ){
+      qx=-qx;
+      qy=-qy;
+      qz=-qz;
+      qw=-qw;
+      //ROS_INFO(" Quaternion sign change detected >>>>>>>>>>>>>>>>>>>>> ");
+    }
+    q0_x=qx;
+    q0_y=qy;
+    q0_z=qz;
     attitude.x=qx;
     attitude.y=qy;
     attitude.z=qz;
@@ -484,12 +510,12 @@ void CoordinatorBase<T>::ekf_callback(const ff_msgs::EkfState::ConstPtr msg) {
     omega.x=wx;
     omega.y=wy;
     omega.z=wz;
-    geometry_msgs::Vector3 torque, axes_rot;
-    double r=0, p=0, y=-1*3.1459/4;  // Rotate the previous pose by 45* about Z
-    axes_rot.x = 0;
+   // geometry_msgs::Vector3 torque, axes_rot;
+    double r=0, p=0, y=-3.14159265/180*180;  // Rotate the previous pose by 45* about Z
+   /*  axes_rot.x = 0;
     axes_rot.y = 0;
     axes_rot.z = 1;
-    double angle = 45/180*3.14570;
+    double angle = 45/180*3.14570; */
         q_ref.setRPY(r, p, y);
         //q_ref.setRotation(axes_rot, 45/180*3.14570);
         tf2::convert(attitude,attitude_);
@@ -599,7 +625,7 @@ void CoordinatorBase<T>::ekf_callback(const ff_msgs::EkfState::ConstPtr msg) {
 
     tubing_mpc();
     count+=1;
-    if (count==101){
+    if (count==11){
 
       count =0;
     }
@@ -627,6 +653,8 @@ void CoordinatorBase<T>::tubing_mpc(){
   //sub-checkpoint --------------------------------------->>>>>
   double a[18] = { 2.0202, 0.0, 0.0, 0.0, 2.0202, 0.0, 0.0, 0.0,
     2.0202, 4.0895, 0.0, 0.0, 0.0, 4.0895, 0.0, 0.0, 0.0, 4.0895 };
+    // 2.0202, 0.0, 0.0, 0.0, 2.0202, 0.0, 0.0, 0.0,
+    //2.0202, 4.0895, 0.0, 0.0, 0.0, 4.0895, 0.0, 0.0, 0.0, 4.0895 
   double b_x[6];
   double d;
 
@@ -658,8 +686,8 @@ template<typename T>
 void CoordinatorBase<T>::nominal_dynamics(){
   // checkpoint nominal dynamics --------------------------->>>>>>>>
    double b_a[36] = { 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0,
-    0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0, 1.0, 0.0, 0.0,
-    0.0, 2.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0, 1.0 };
+    0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.16, 0.0, 0.0, 1.0, 0.0, 0.0,
+    0.0, 0.16, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.16, 0.0, 0.0, 1.0 };
 
    double a[18] = { 0.052067, 0.0, 0.0, 0.052067, 0.0, 0.0, 0.0,
     0.052067, 0.0, 0.0, 0.052067, 0.0, 0.0, 0.0, 0.052067, 0.0, 0.0,
@@ -751,10 +779,10 @@ void CoordinatorBase<T>::step_PID(){
  arg_fz=u[2];
 
 
- double qw = arg_qx;
- double qx = arg_qx;
- double qy = arg_qy;
- double qz = arg_qz;
+ double qw = q_e.getW();
+ double qx = q_e.getX();
+ double qy = q_e.getY();
+ double qz = q_e.getZ();
  double fx = Fx; 
  double fy = Fy;
  double fz = Fz;
@@ -837,10 +865,14 @@ float a1[18] = { -0.0053271706630077078, -0.0, -0.0, -0.0,
   for (i = 0; i < 3; i++) {
     U[i] -= ((b_a[i] * d) + (b_a[i + 3] * d1)) + (b_a[i + 6] * d2);
   }
+ inti_e_x-=q_e.getX()*0.16;
+ inti_e_y-=q_e.getY()*0.16;
+ inti_e_z-=q_e.getZ()*0.16;
+ double Ki=0.0002;
 
-  arg_tau_x = U[0];
-  arg_tau_y = U[1];
-  arg_tau_z = U[2];
+  arg_tau_x = U[0] + Ki*inti_e_x;
+  arg_tau_y = U[1] + Ki*inti_e_y;
+  arg_tau_z = U[2] + Ki*inti_e_z;
 
 
 }
