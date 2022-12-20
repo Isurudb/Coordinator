@@ -23,9 +23,15 @@ void PrimaryNodelet::RunTest0(ros::NodeHandle *nh){
         NODELET_ERROR_STREAM("[PRIMARY/DMPC] Failed to Launch DMPC nodes.");
     }
     ROS_INFO("Initializing the position data....");
-    position_ref.x = 0.5;
+    position_ref.x = -0.5;
     position_ref.y = -0.6;
     position_ref.z =  position_.z+0.00;
+
+    //debug quaternion ambiguity
+    /*q 0_x = attitude.x;
+    q0_y = attitude.y;
+    q0_z = attitude.z; */
+
    /*  z_nominal[0]=x0[0];
       z_nominal[1]=x0[1];
       z_nominal[2]=x0[2];
@@ -89,20 +95,49 @@ primary_status_.control_mode = "regulate";
         float u_y = kN[1];//]Fy;//arg_fy;//-13.5*velocity_.y -0.85*position_error.y;
         float u_z = kN[2];//Fz;//arg_fz;//-1.0*velocity_.z -0.1*position_error.z;
 
+        float f_max=0.6;
+        float f_min=-0.6;
+
+        if (u_x>f_max){
+            u_x=f_max;
+        }
+
+         if (u_y>f_max){
+            u_y=f_max;
+        }
+
+         if (u_z>f_max){
+            u_z=f_max;
+        }
+
+        if (u_x<f_min){
+            u_x=f_min;
+        }
+
+        if (u_y<f_min){
+            u_y=f_min;
+        }
+        if (u_z<f_min){
+            u_z=f_min;
+        }
+
 
 
         if (rotation_done)
         {
-            ROS_INFO(" Deploying TRMPC for transverse motion  ex: [%f]  ey: [%f] ez: [%f]",position_error.x, position_error.y, position_error.z);
+            
             ctl_input.force.x = u_x*R_11 + u_y*R_21 + u_z*R_31;//-0.05*velocity_.x +0.005*position_error.x;
             ctl_input.force.y = u_x*R_12 + u_y*R_22 + u_z*R_32;//-0.05*velocity_.y -0.005*position_error.y;
             ctl_input.force.z = u_x*R_13 + u_y*R_23 + u_z*R_33;//-0.05*velocity_.z +0.005*position_error.z;
+            ROS_INFO(" Deploying TRMPC for transverse motion  ex: [%f]  ey: [%f] ez: [%f]\n Fx: [%f] Fy: [%f] Fz: [%f] ",
+            position_error.x, position_error.y, position_error.z,ctl_input.force.x,ctl_input.force.y,ctl_input.force.z);
            
         }
         else
         {
 
-            ROS_INFO(" Deploying TRMPC for transverse motion  ex: [%f]  ey: [%f] ez: [%f]",position_error.x, position_error.y, position_error.z);
+            ROS_INFO(" Deploying TRMPC for transverse motion  ex: [%f]  ey: [%f] ez: [%f]\n Fx: [%f] Fy: [%f] Fz: [%f]",
+            position_error.x, position_error.y, position_error.z,ctl_input.force.x,ctl_input.force.y,ctl_input.force.z);
             ctl_input.force.x = u_x*R_11 + u_y*R_21 + u_z*R_31;//-0.05*velocity_.x +0.005*position_error.x;
             ctl_input.force.y = u_x*R_12 + u_y*R_22 + u_z*R_32;//-0.05*velocity_.y -0.005*position_error.y;
             ctl_input.force.z = u_x*R_13 + u_y*R_23 + u_z*R_33;//-0.05*velocity_.z +0.005*position_error.z;
@@ -115,7 +150,7 @@ primary_status_.control_mode = "regulate";
          }
             
         
-        //ROS_INFO("qx: [%f]  qy: [%f] qz: [%f] qw: [%f]", q_e.getX()*q_e.getX(),q_e.getY()*q_e.getY(),q_e.getZ()*q_e.getZ(),q_e.getW());
+        ROS_INFO("qx: [%f]  qy: [%f] qz: [%f] qw: [%f]", q_e.getX()*q_e.getX(),q_e.getY()*q_e.getY(),q_e.getZ()*q_e.getZ(),q_e.getW());
 
 
         gnc_setpoint.header.frame_id="body";
@@ -207,7 +242,7 @@ primary_status_.control_mode = "regulate";
          }
             
         
-        //ROS_INFO("qx: [%f]  qy: [%f] qz: [%f] qw: [%f]", q_e.getX()*q_e.getX(),q_e.getY()*q_e.getY(),q_e.getZ()*q_e.getZ(),q_e.getW());
+        ROS_INFO("qx: [%f]  qy: [%f] qz: [%f] qw: [%f]", q_e.getX()*q_e.getX(),q_e.getY()*q_e.getY(),q_e.getZ()*q_e.getZ(),q_e.getW());
 
 
         gnc_setpoint.header.frame_id="body";
