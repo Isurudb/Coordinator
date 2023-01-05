@@ -590,15 +590,18 @@ void CoordinatorBase<T>::ekf_callback(const ff_msgs::EkfState::ConstPtr msg) {
     double *taux;
     double *tauy;
     double *tauz; */
-    step_PID();
-    x0[0]=position_error.x;
+    // Initiating PID controller <<<<<<<<<<<<<<<<<<<<<<<ID
+    /* step_PID(); */ //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<ID
+    // MPC Controller inbound <<<<<<<<<<<<<<<<<<<<<<<ID
+    /* x0[0]=position_error.x;
     x0[1]=position_error.y;
     x0[2]=position_error.z;
     x0[3]=vx;
     x0[4]=vy;
     x0[5]=vz;
-    MPC_Guidance_v3_sand();
-    v_mpc[0]=Fx;
+    MPC_Guidance_v3_sand(); */ //>>>>>>>>>>>>>>>>>>>>>ID
+    // TRMPC Inbound <<<<<<<<<<<<<<<<<<<<<<<<<<<<ID
+    /* v_mpc[0]=Fx;
     v_mpc[1]=Fy;
     v_mpc[2]=Fz;
     nominal_dynamics();
@@ -637,13 +640,13 @@ void CoordinatorBase<T>::ekf_callback(const ff_msgs::EkfState::ConstPtr msg) {
       double svx=x0[3]-zp_nextNominal[3];
       double svy=x0[4]-zp_nextNominal[4];
       double svz=x0[5]-zp_nextNominal[5]; */
-
+     /* -------------------------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>ID   
     tubing_mpc();
     count+=1;
     if (count==11){
 
       count =0;
-    }
+    } */
     //X_QP=X_Qp
    // rt_OneStep();
    //ROS_INFO("ex: [%f]  ey: [%f] ez: [%f] ev_x: [%f] ev_y: [%f] ev_z: [%f]", sx,sy,sz,svx,svy,svz);
