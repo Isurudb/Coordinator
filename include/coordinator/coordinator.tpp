@@ -163,7 +163,10 @@ class CoordinatorBase
   virtual void RunTest0(ros::NodeHandle *nh) {};
   virtual void RunTest1(ros::NodeHandle *nh) {};
   virtual void RunTest2(ros::NodeHandle *nh) {};
-
+  virtual void RunTest3(ros::NodeHandle *nh) {};
+  virtual void RunTest4(ros::NodeHandle *nh) {};
+  virtual void RunTest5(ros::NodeHandle *nh) {};
+  virtual void RunTest6(ros::NodeHandle *nh) {};
 
   //controller1ModelClass controller1_Obj;// Instance of model class
 
@@ -321,6 +324,18 @@ void CoordinatorBase<T>::Run(ros::NodeHandle *nh) {
       }
       else if(base_status_.test_number  == 2) {
         RunTest2(nh);
+      }
+      else if(base_status_.test_number  == 3) {
+        RunTest3(nh);
+      }
+      else if(base_status_.test_number  == 4) {
+        RunTest4(nh);
+      }
+      else if(base_status_.test_number  == 5) {
+        RunTest5(nh);
+      }
+      else if(base_status_.test_number  == 6) {
+        RunTest6(nh);
       }
       // add additional test checks here
 
@@ -511,7 +526,7 @@ void CoordinatorBase<T>::ekf_callback(const ff_msgs::EkfState::ConstPtr msg) {
     omega.y=wy;
     omega.z=wz;
    // geometry_msgs::Vector3 torque, axes_rot;
-    double r=0, p=0, y=3.14159265/180*225;  // Rotate the previous pose by 45* about Z
+    double r=0, p=0, y=3.14159265/180*180;  // Rotate the previous pose by 45* about Z
    /*  axes_rot.x = 0;
     axes_rot.y = 0;
     axes_rot.z = 1;

@@ -24,7 +24,7 @@ void PrimaryNodelet::RunTest0(ros::NodeHandle *nh){
     }
     ROS_INFO("Initializing the position data....");
     position_ref.x = -0.5;
-    position_ref.y = -0.6;
+    position_ref.y = 0.6;
     position_ref.z =  position_.z+0.00;
 
     //debug quaternion ambiguity
@@ -268,11 +268,122 @@ primary_status_.control_mode = "regulate";
     NODELET_DEBUG_STREAM("[PRIMARY COORD]: ...test complete!");
     base_status_.test_finished = true;
 }
+/**************************************************************************************************/
+//Test 3
+/**************************************************************************************************/
+void PrimaryNodelet::RunTest3(ros::NodeHandle *nh){
+    /*  Good estimate TRMPC
+    */
+RunTest0(nh);
+    ROS_INFO("Runnig Test 1 now ");
+primary_status_.control_mode = "regulate";
+    ros::Duration(0.4).sleep(); // make sure controller gets the regulate settings before disabling default controller.
+   
+    NODELET_DEBUG_STREAM("[PRIMARY COORD]: Disabling default controller...");
+    disable_default_ctl();
+ ROS_INFO("Initiating the Quaternion Feedback Controller");
+    ros::Rate loop_rate(62.5);
+ ROS_INFO("Setting up the publisher ");
+    while(ros::ok()){
+        
+         ROS_INFO("Runnig test 3 ---- TRMPC -- Good Estimate ");
 
 
+        loop_rate.sleep();
+
+        ros::spinOnce();
+
+    };
+    //****************************************************************************************************
+    NODELET_DEBUG_STREAM("[PRIMARY COORD]: ...test complete!");
+    base_status_.test_finished = true;
+}
 
 
+void PrimaryNodelet::RunTest4(ros::NodeHandle *nh){
+    /*  Good estimate MPC
+    */
+RunTest0(nh);
+    ROS_INFO("Runnig Test 1 now ");
+primary_status_.control_mode = "regulate";
+    ros::Duration(0.4).sleep(); // make sure controller gets the regulate settings before disabling default controller.
+   
+    NODELET_DEBUG_STREAM("[PRIMARY COORD]: Disabling default controller...");
+    disable_default_ctl();
+ ROS_INFO("Initiating the Quaternion Feedback Controller");
+    ros::Rate loop_rate(62.5);
+ ROS_INFO("Setting up the publisher ");
+    while(ros::ok()){
+        
+         ROS_INFO("Runnig test 4 ---- MPC -- Good Estimate ");
 
+
+        loop_rate.sleep();
+
+        ros::spinOnce();
+
+    };
+    //****************************************************************************************************
+    NODELET_DEBUG_STREAM("[PRIMARY COORD]: ...test complete!");
+    base_status_.test_finished = true;
+}
+
+void PrimaryNodelet::RunTest5(ros::NodeHandle *nh){
+    /*  Best estimate TRMPC
+    */
+RunTest0(nh);
+    ROS_INFO("Runnig Test 1 now ");
+primary_status_.control_mode = "regulate";
+    ros::Duration(0.4).sleep(); // make sure controller gets the regulate settings before disabling default controller.
+   
+    NODELET_DEBUG_STREAM("[PRIMARY COORD]: Disabling default controller...");
+    disable_default_ctl();
+ ROS_INFO("Initiating the Quaternion Feedback Controller");
+    ros::Rate loop_rate(62.5);
+ ROS_INFO("Setting up the publisher ");
+    while(ros::ok()){
+        
+         ROS_INFO("Runnig test 5 ---- TRMPC -- Best Estimate ");
+
+
+        loop_rate.sleep();
+
+        ros::spinOnce();
+
+    };
+    //****************************************************************************************************
+    NODELET_DEBUG_STREAM("[PRIMARY COORD]: ...test complete!");
+    base_status_.test_finished = true;
+}
+
+
+void PrimaryNodelet::RunTest6(ros::NodeHandle *nh){
+    /*  Best estimate MPC
+    */
+RunTest0(nh);
+    ROS_INFO("Runnig Test 1 now ");
+primary_status_.control_mode = "regulate";
+    ros::Duration(0.4).sleep(); // make sure controller gets the regulate settings before disabling default controller.
+   
+    NODELET_DEBUG_STREAM("[PRIMARY COORD]: Disabling default controller...");
+    disable_default_ctl();
+ ROS_INFO("Initiating the Quaternion Feedback Controller");
+    ros::Rate loop_rate(62.5);
+ ROS_INFO("Setting up the publisher ");
+    while(ros::ok()){
+        
+         ROS_INFO("Runnig test 6 ---- MPC -- Best Estimate ");
+
+
+        loop_rate.sleep();
+
+        ros::spinOnce();
+
+    };
+    //****************************************************************************************************
+    NODELET_DEBUG_STREAM("[PRIMARY COORD]: ...test complete!");
+    base_status_.test_finished = true;
+}
 
 
 
