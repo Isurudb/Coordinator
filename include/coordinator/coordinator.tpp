@@ -136,6 +136,8 @@ class CoordinatorBase
   // Stored status parameters
   std::string stored_control_mode_ = "track";  // stored control_mode, set by parameter inputs
 
+  std::string Estimate_status = "Best";
+
   // Ekf state
   Eigen::Matrix<double, 16, 1> x_real_complete_;
 
@@ -591,20 +593,26 @@ void CoordinatorBase<T>::ekf_callback(const ff_msgs::EkfState::ConstPtr msg) {
     double *tauy;
     double *tauz; */
     // Initiating PID controller <<<<<<<<<<<<<<<<<<<<<<<ID
-    /* step_PID(); */ //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<ID
+    if(Estimate_status=="Best"){
+    step_PID(); //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<ID
+    }
     // MPC Controller inbound <<<<<<<<<<<<<<<<<<<<<<<ID
-    /* x0[0]=position_error.x;
+    x0[0]=position_error.x;
     x0[1]=position_error.y;
     x0[2]=position_error.z;
     x0[3]=vx;
     x0[4]=vy;
     x0[5]=vz;
-    MPC_Guidance_v3_sand(); */ //>>>>>>>>>>>>>>>>>>>>>ID
+    if(Estimate_status=="Best"){
+    MPC_Guidance_v3_sand(); //>>>>>>>>>>>>>>>>>>>>>ID
+    }
     // TRMPC Inbound <<<<<<<<<<<<<<<<<<<<<<<<<<<<ID
-    /* v_mpc[0]=Fx;
+    v_mpc[0]=Fx;
     v_mpc[1]=Fy;
     v_mpc[2]=Fz;
+    if(Estimate_status=="Best"){
     nominal_dynamics();
+    }
     //sqrt(q_e.getX()*q_e.getX()+q_e.getY()*q_e.getY()+q_e.getZ()*q_e.getZ())>0.005
     if (count==0){
       z_nominal[0]=x0[0];
@@ -640,13 +648,15 @@ void CoordinatorBase<T>::ekf_callback(const ff_msgs::EkfState::ConstPtr msg) {
       double svx=x0[3]-zp_nextNominal[3];
       double svy=x0[4]-zp_nextNominal[4];
       double svz=x0[5]-zp_nextNominal[5]; */
-     /* -------------------------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>ID   
+     /* -------------------------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>ID   */
+     if(Estimate_status=="Best"){
     tubing_mpc();
+     }
     count+=1;
     if (count==11){
 
       count =0;
-    } */
+    } 
     //X_QP=X_Qp
    // rt_OneStep();
    //ROS_INFO("ex: [%f]  ey: [%f] ez: [%f] ev_x: [%f] ev_y: [%f] ev_z: [%f]", sx,sy,sz,svx,svy,svz);
