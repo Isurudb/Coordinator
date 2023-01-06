@@ -62,6 +62,8 @@ void PrimaryNodelet::RunTest0(ros::NodeHandle *nh){
 void PrimaryNodelet::RunTest1(ros::NodeHandle *nh){
     /* RATTLE test: hand off control to RATTLE coordinator
     */
+ROS_INFO("Runnig Test 1 -- Worst Estimate -- TRMPC");
+Estimate_status="Worst";
 RunTest0(nh);
     ROS_INFO("Runnig Test 1 now ");
 primary_status_.control_mode = "regulate";
@@ -77,8 +79,10 @@ primary_status_.control_mode = "regulate";
  ROS_INFO("Initiating the Quaternion Feedback Controller");
     ros::Rate loop_rate(62.5);
  ROS_INFO("Setting up the publisher ");
+ int t=0;
     while(ros::ok()){
         
+        // Rotation matrix
         // q_e= q_ref_inv*attitude_;  // Calculate the new orientation
         // q_e.normalize();
         float R_11 = 2*(attitude.x*attitude.x + attitude.w*attitude.w)-1;
@@ -122,36 +126,22 @@ primary_status_.control_mode = "regulate";
         }
 
 
-
-        if (rotation_done)
-        {
             
             ctl_input.force.x = u_x*R_11 + u_y*R_21 + u_z*R_31;//-0.05*velocity_.x +0.005*position_error.x;
             ctl_input.force.y = u_x*R_12 + u_y*R_22 + u_z*R_32;//-0.05*velocity_.y -0.005*position_error.y;
             ctl_input.force.z = u_x*R_13 + u_y*R_23 + u_z*R_33;//-0.05*velocity_.z +0.005*position_error.z;
-            ROS_INFO(" Deploying TRMPC for transverse motion  ex: [%f]  ey: [%f] ez: [%f]\n Fx: [%f] Fy: [%f] Fz: [%f] ",
-            position_error.x, position_error.y, position_error.z,ctl_input.force.x,ctl_input.force.y,ctl_input.force.z);
-           
-        }
-        else
-        {
-
-            ROS_INFO(" Deploying TRMPC for transverse motion  ex: [%f]  ey: [%f] ez: [%f]\n Fx: [%f] Fy: [%f] Fz: [%f]",
-            position_error.x, position_error.y, position_error.z,ctl_input.force.x,ctl_input.force.y,ctl_input.force.z);
-            ctl_input.force.x = u_x*R_11 + u_y*R_21 + u_z*R_31;//-0.05*velocity_.x +0.005*position_error.x;
-            ctl_input.force.y = u_x*R_12 + u_y*R_22 + u_z*R_32;//-0.05*velocity_.y -0.005*position_error.y;
-            ctl_input.force.z = u_x*R_13 + u_y*R_23 + u_z*R_33;//-0.05*velocity_.z +0.005*position_error.z;
-            /* ctl_input.force.x=0;//-0.05*velocity_.x ;
-            ctl_input.force.y=0;//-0.05*velocity_.y ;
-            ctl_input.force.z=0;//-0.05*velocity_.z ; */
-        }
-         if (sqrt(q_e.getX()*q_e.getX()+q_e.getY()*q_e.getY()+q_e.getZ()*q_e.getZ())<0.05){
-                rotation_done = true;
-         }
             
         
+        
+       
+         
+         if(t==60){ 
+        ROS_INFO(" Deploying TRMPC for transverse motion  ex: [%f]  ey: [%f] ez: [%f]\n Fx: [%f] Fy: [%f] Fz: [%f] ",
+            position_error.x, position_error.y, position_error.z,ctl_input.force.x,ctl_input.force.y,ctl_input.force.z);
+           
         ROS_INFO("qx: [%f]  qy: [%f] qz: [%f] qw: [%f]", q_e.getX()*q_e.getX(),q_e.getY()*q_e.getY(),q_e.getZ()*q_e.getZ(),q_e.getW());
-
+         t=0;
+         }
 
         gnc_setpoint.header.frame_id="body";
         gnc_setpoint.header.stamp=ros::Time::now();
@@ -163,8 +153,12 @@ primary_status_.control_mode = "regulate";
         ctl_input.torque.x=arg_tau_x;//-0.02*q_e.getX()-0.2*omega.x;
         ctl_input.torque.y=arg_tau_y;//-0.02*q_e.getY()-0.2*omega.y;
         ctl_input.torque.z=arg_tau_z;//-0.02*q_e.getZ()-0.2*omega.z;
+  
+        
 
         pub_ctl_.publish(gnc_setpoint);
+        t+=1;
+ 
         loop_rate.sleep();
 
         ros::spinOnce();
@@ -185,23 +179,19 @@ primary_status_.control_mode = "regulate";
 void PrimaryNodelet::RunTest2(ros::NodeHandle *nh){
     /* RATTLE test: hand off control to RATTLE coordinator
     */
+ROS_INFO("Test 2 -- Worst Estimate -- MPC");
+Estimate_status="Worst";
 RunTest0(nh);
-    ROS_INFO("Runnig Test 2 now the linaer MPC is being executed !!!! ");
 primary_status_.control_mode = "regulate";
     ros::Duration(0.4).sleep(); // make sure controller gets the regulate settings before disabling default controller.
-    // geometry_msgs::Vector3 torque;
-    // double r=0, p=0, y=3.14159;  // Rotate the previous pose by 180* about Z
-
-    //     q_ref.setRPY(r, p, y);
-    //     tf2::convert(attitude,attitude_);
-    //     q_ref_inv=q_ref;//.inverse();
     NODELET_DEBUG_STREAM("[PRIMARY COORD]: Disabling default controller...");
     disable_default_ctl();
  ROS_INFO("Initiating the Quaternion Feedback Controller");
     ros::Rate loop_rate(62.5);
  ROS_INFO("Setting up the publisher ");
+ int t=0;
     while(ros::ok()){
-        
+        // Rotation matrix
         // q_e= q_ref_inv*attitude_;  // Calculate the new orientation
         // q_e.normalize();
         float R_11 = 2*(attitude.x*attitude.x + attitude.w*attitude.w)-1;
@@ -218,32 +208,22 @@ primary_status_.control_mode = "regulate";
         float u_y = X_QP[1];//]Fy;//arg_fy;//-13.5*velocity_.y -0.85*position_error.y;
         float u_z = X_QP[2];//Fz;//arg_fz;//-1.0*velocity_.z -0.1*position_error.z;
 
-
-
-        if (rotation_done)
-        {
-            ROS_INFO(" Deploying LMPC for transverse motion  ex: [%f]  ey: [%f] ez: [%f] \n Fx: [%f] Fy: [%f] Fz: [%f]",
-            position_error.x, position_error.y, position_error.z,X_QP[0],X_QP[1],X_QP[2]);
-            ctl_input.force.x = u_x*R_11 + u_y*R_21 + u_z*R_31;//-0.05*velocity_.x +0.005*position_error.x;
-            ctl_input.force.y = u_x*R_12 + u_y*R_22 + u_z*R_32;//-0.05*velocity_.y -0.005*position_error.y;
-            ctl_input.force.z = u_x*R_13 + u_y*R_23 + u_z*R_33;//-0.05*velocity_.z +0.005*position_error.z;
-           
-        }
-        else
-        {
-            ROS_INFO(" Deploying LMPC for transverse motion  ex: [%f]  ey: [%f] ez: [%f] \n Fx: [%f] Fy: [%f] Fz: [%f]",
-            position_error.x, position_error.y, position_error.z,X_QP[0],X_QP[1],X_QP[2]);
-            ctl_input.force.x = u_x*R_11 + u_y*R_21 + u_z*R_31;//-0.05*velocity_.x +0.005*position_error.x;
-            ctl_input.force.y = u_x*R_12 + u_y*R_22 + u_z*R_32;//-0.05*velocity_.y -0.005*position_error.y;
-            ctl_input.force.z = u_x*R_13 + u_y*R_23 + u_z*R_33;//-0.05*velocity_.z +0.005*position_error.z;
-        }
-         if (sqrt(q_e.getX()*q_e.getX()+q_e.getY()*q_e.getY()+q_e.getZ()*q_e.getZ())<0.05){
-                rotation_done = true;
-         }
+               
+        ctl_input.force.x = u_x*R_11 + u_y*R_21 + u_z*R_31;//-0.05*velocity_.x +0.005*position_error.x;
+        ctl_input.force.y = u_x*R_12 + u_y*R_22 + u_z*R_32;//-0.05*velocity_.y -0.005*position_error.y;
+        ctl_input.force.z = u_x*R_13 + u_y*R_23 + u_z*R_33;//-0.05*velocity_.z +0.005*position_error.z;
             
         
+        
+       
+         
+         if(t==60){ 
+        ROS_INFO(" Deploying MPC for transverse motion  ex: [%f]  ey: [%f] ez: [%f]\n Fx: [%f] Fy: [%f] Fz: [%f] ",
+            position_error.x, position_error.y, position_error.z,ctl_input.force.x,ctl_input.force.y,ctl_input.force.z);
+           
         ROS_INFO("qx: [%f]  qy: [%f] qz: [%f] qw: [%f]", q_e.getX()*q_e.getX(),q_e.getY()*q_e.getY(),q_e.getZ()*q_e.getZ(),q_e.getW());
-
+         t=0;
+         }
 
         gnc_setpoint.header.frame_id="body";
         gnc_setpoint.header.stamp=ros::Time::now();
@@ -255,8 +235,15 @@ primary_status_.control_mode = "regulate";
         ctl_input.torque.x=arg_tau_x;//-0.02*q_e.getX()-0.2*omega.x;
         ctl_input.torque.y=arg_tau_y;//-0.02*q_e.getY()-0.2*omega.y;
         ctl_input.torque.z=arg_tau_z;//-0.02*q_e.getZ()-0.2*omega.z;
+  
+        
 
         pub_ctl_.publish(gnc_setpoint);
+        
+
+        t+=1;
+
+        
         loop_rate.sleep();
 
         ros::spinOnce();

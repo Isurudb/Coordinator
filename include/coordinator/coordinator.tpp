@@ -599,6 +599,9 @@ void CoordinatorBase<T>::ekf_callback(const ff_msgs::EkfState::ConstPtr msg) {
     else if(Estimate_status=="Good"){
     step_PID();
     }
+    else if(Estimate_status=="Worst"){
+    step_PID();
+    }
     // MPC Controller inbound <<<<<<<<<<<<<<<<<<<<<<<ID
     x0[0]=position_error.x;
     x0[1]=position_error.y;
@@ -612,6 +615,9 @@ void CoordinatorBase<T>::ekf_callback(const ff_msgs::EkfState::ConstPtr msg) {
     else if(Estimate_status=="Good"){
      MPC_Guidance_v3_sand();
     }
+    else if(Estimate_status=="Worst"){
+     MPC_Guidance_v3_sand();
+    }
     // TRMPC Inbound <<<<<<<<<<<<<<<<<<<<<<<<<<<<ID
     v_mpc[0]=Fx;
     v_mpc[1]=Fy;
@@ -622,6 +628,9 @@ void CoordinatorBase<T>::ekf_callback(const ff_msgs::EkfState::ConstPtr msg) {
     else if(Estimate_status=="Good"){
      nominal_dynamics();
     }  
+    else if(Estimate_status=="Worst"){
+     nominal_dynamics();
+    } 
     //sqrt(q_e.getX()*q_e.getX()+q_e.getY()*q_e.getY()+q_e.getZ()*q_e.getZ())>0.005
     if (count==0){
       z_nominal[0]=x0[0];
@@ -662,6 +671,9 @@ void CoordinatorBase<T>::ekf_callback(const ff_msgs::EkfState::ConstPtr msg) {
     tubing_mpc();
      }
      else if(Estimate_status=="Good"){
+    tubing_mpc();
+     }
+      else if(Estimate_status=="Worst"){
     tubing_mpc();
      }
     count+=1;
