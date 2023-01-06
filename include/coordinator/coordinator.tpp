@@ -596,6 +596,9 @@ void CoordinatorBase<T>::ekf_callback(const ff_msgs::EkfState::ConstPtr msg) {
     if(Estimate_status=="Best"){
     step_PID(); //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<ID
     }
+    else if(Estimate_status=="Good"){
+    step_PID();
+    }
     // MPC Controller inbound <<<<<<<<<<<<<<<<<<<<<<<ID
     x0[0]=position_error.x;
     x0[1]=position_error.y;
@@ -606,6 +609,9 @@ void CoordinatorBase<T>::ekf_callback(const ff_msgs::EkfState::ConstPtr msg) {
     if(Estimate_status=="Best"){
     MPC_Guidance_v3_sand(); //>>>>>>>>>>>>>>>>>>>>>ID
     }
+    else if(Estimate_status=="Good"){
+     MPC_Guidance_v3_sand();
+    }
     // TRMPC Inbound <<<<<<<<<<<<<<<<<<<<<<<<<<<<ID
     v_mpc[0]=Fx;
     v_mpc[1]=Fy;
@@ -613,6 +619,9 @@ void CoordinatorBase<T>::ekf_callback(const ff_msgs::EkfState::ConstPtr msg) {
     if(Estimate_status=="Best"){
     nominal_dynamics();
     }
+    else if(Estimate_status=="Good"){
+     nominal_dynamics();
+    }  
     //sqrt(q_e.getX()*q_e.getX()+q_e.getY()*q_e.getY()+q_e.getZ()*q_e.getZ())>0.005
     if (count==0){
       z_nominal[0]=x0[0];
@@ -650,6 +659,9 @@ void CoordinatorBase<T>::ekf_callback(const ff_msgs::EkfState::ConstPtr msg) {
       double svz=x0[5]-zp_nextNominal[5]; */
      /* -------------------------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>ID   */
      if(Estimate_status=="Best"){
+    tubing_mpc();
+     }
+     else if(Estimate_status=="Good"){
     tubing_mpc();
      }
     count+=1;
