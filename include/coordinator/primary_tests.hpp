@@ -331,6 +331,7 @@ primary_status_.control_mode = "regulate";
 void PrimaryNodelet::RunTest5(ros::NodeHandle *nh){
     /*  Best estimate TRMPC
     */
+ ROS_INFO("Test 5  TRMPC -- Best Estimate -- status -- <<< Initiated >>> ");
 RunTest0(nh);
     ROS_INFO("Runnig Test 1 now ");
 primary_status_.control_mode = "regulate";
@@ -338,42 +339,15 @@ primary_status_.control_mode = "regulate";
    
     NODELET_DEBUG_STREAM("[PRIMARY COORD]: Disabling default controller...");
     disable_default_ctl();
+    Estimate_status=="Best";
  ROS_INFO("Initiating the Quaternion Feedback Controller");
     ros::Rate loop_rate(62.5);
  ROS_INFO("Setting up the publisher ");
+ int t=0;
     while(ros::ok()){
         
-         ROS_INFO("Runnig test 5 ---- TRMPC -- Best Estimate ");
-
-
-        loop_rate.sleep();
-
-        ros::spinOnce();
-
-    };
-    //****************************************************************************************************
-    NODELET_DEBUG_STREAM("[PRIMARY COORD]: ...test complete!");
-    base_status_.test_finished = true;
-}
-
-
-void PrimaryNodelet::RunTest6(ros::NodeHandle *nh){
-    /*  Best estimate MPC
-    */
-ROS_INFO("Test 6  MPC -- Best Estimate -- status -- <<< Initiated >>>");
-RunTest0(nh);
-    ROS_INFO("Runnig Test 1 now ");
-primary_status_.control_mode = "regulate";
-    ros::Duration(0.4).sleep(); // make sure controller gets the regulate settings before disabling default controller.
-   
-    NODELET_DEBUG_STREAM("[PRIMARY COORD]: Disabling default controller...");
-    disable_default_ctl();
- Estimate_status=="Best";
- ROS_INFO("Initiating the Quaternion Feedback Controller");
-    ros::Rate loop_rate(62.5);
- ROS_INFO("Setting up the publisher ");
-    while(ros::ok()){
-        // Rotation matrix
+        
+    // Rotation matrix
         // q_e= q_ref_inv*attitude_;  // Calculate the new orientation
         // q_e.normalize();
         float R_11 = 2*(attitude.x*attitude.x + attitude.w*attitude.w)-1;
@@ -417,36 +391,22 @@ primary_status_.control_mode = "regulate";
         }
 
 
-
-        if (rotation_done)
-        {
             
             ctl_input.force.x = u_x*R_11 + u_y*R_21 + u_z*R_31;//-0.05*velocity_.x +0.005*position_error.x;
             ctl_input.force.y = u_x*R_12 + u_y*R_22 + u_z*R_32;//-0.05*velocity_.y -0.005*position_error.y;
             ctl_input.force.z = u_x*R_13 + u_y*R_23 + u_z*R_33;//-0.05*velocity_.z +0.005*position_error.z;
-            ROS_INFO(" Deploying TRMPC for transverse motion  ex: [%f]  ey: [%f] ez: [%f]\n Fx: [%f] Fy: [%f] Fz: [%f] ",
-            position_error.x, position_error.y, position_error.z,ctl_input.force.x,ctl_input.force.y,ctl_input.force.z);
-           
-        }
-        else
-        {
-
-            ROS_INFO(" Deploying TRMPC for transverse motion  ex: [%f]  ey: [%f] ez: [%f]\n Fx: [%f] Fy: [%f] Fz: [%f]",
-            position_error.x, position_error.y, position_error.z,ctl_input.force.x,ctl_input.force.y,ctl_input.force.z);
-            ctl_input.force.x = u_x*R_11 + u_y*R_21 + u_z*R_31;//-0.05*velocity_.x +0.005*position_error.x;
-            ctl_input.force.y = u_x*R_12 + u_y*R_22 + u_z*R_32;//-0.05*velocity_.y -0.005*position_error.y;
-            ctl_input.force.z = u_x*R_13 + u_y*R_23 + u_z*R_33;//-0.05*velocity_.z +0.005*position_error.z;
-            /* ctl_input.force.x=0;//-0.05*velocity_.x ;
-            ctl_input.force.y=0;//-0.05*velocity_.y ;
-            ctl_input.force.z=0;//-0.05*velocity_.z ; */
-        }
-         if (sqrt(q_e.getX()*q_e.getX()+q_e.getY()*q_e.getY()+q_e.getZ()*q_e.getZ())<0.05){
-                rotation_done = true;
-         }
             
         
+        
+       
+         
+         if(t==60){ 
+        ROS_INFO(" Deploying TRMPC for transverse motion  ex: [%f]  ey: [%f] ez: [%f]\n Fx: [%f] Fy: [%f] Fz: [%f] ",
+            position_error.x, position_error.y, position_error.z,ctl_input.force.x,ctl_input.force.y,ctl_input.force.z);
+           
         ROS_INFO("qx: [%f]  qy: [%f] qz: [%f] qw: [%f]", q_e.getX()*q_e.getX(),q_e.getY()*q_e.getY(),q_e.getZ()*q_e.getZ(),q_e.getW());
-
+         t=0;
+         }
 
         gnc_setpoint.header.frame_id="body";
         gnc_setpoint.header.stamp=ros::Time::now();
@@ -458,13 +418,39 @@ primary_status_.control_mode = "regulate";
         ctl_input.torque.x=arg_tau_x;//-0.02*q_e.getX()-0.2*omega.x;
         ctl_input.torque.y=arg_tau_y;//-0.02*q_e.getY()-0.2*omega.y;
         ctl_input.torque.z=arg_tau_z;//-0.02*q_e.getZ()-0.2*omega.z;
-
-
-        
+  
         
 
         pub_ctl_.publish(gnc_setpoint);
+        loop_rate.sleep();
 
+        ros::spinOnce();
+
+        t+=1;
+
+    };
+    //****************************************************************************************************
+    NODELET_DEBUG_STREAM("[PRIMARY COORD]: ...test complete!");
+    base_status_.test_finished = true;
+}
+
+
+void PrimaryNodelet::RunTest6(ros::NodeHandle *nh){
+    /*  Best estimate MPC
+    */
+ROS_INFO("Test 6  MPC -- Best Estimate -- status -- <<< Initiated >>>");
+RunTest0(nh);
+    ROS_INFO("Runnig Test 1 now ");
+primary_status_.control_mode = "regulate";
+    ros::Duration(0.4).sleep(); // make sure controller gets the regulate settings before disabling default controller.
+   
+    NODELET_DEBUG_STREAM("[PRIMARY COORD]: Disabling default controller...");
+    disable_default_ctl();
+ Estimate_status=="Best";
+ ROS_INFO("Initiating the Quaternion Feedback Controller");
+    ros::Rate loop_rate(62.5);
+ ROS_INFO("Setting up the publisher ");
+    while(ros::ok()){
         loop_rate.sleep();
 
         ros::spinOnce();
