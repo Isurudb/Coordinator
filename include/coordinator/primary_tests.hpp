@@ -24,7 +24,7 @@ void PrimaryNodelet::RunTest0(ros::NodeHandle *nh){
     }
     ROS_INFO("Initializing the position data....");
     position_ref.x = -0.5;
-    position_ref.y = 0.6;
+    position_ref.y = -0.6;
     position_ref.z =  position_.z+0.00;
 
     //debug quaternion ambiguity
@@ -59,7 +59,7 @@ void PrimaryNodelet::RunTest0(ros::NodeHandle *nh){
 
 
 /************************************************************************/
-void PrimaryNodelet::RunTest1(ros::NodeHandle *nh){
+void PrimaryNodelet::RunTest5(ros::NodeHandle *nh){
     /* RATTLE test: hand off control to RATTLE coordinator
     */
 ROS_INFO("Runnig Test 1 -- Worst Estimate -- TRMPC");
@@ -176,7 +176,7 @@ primary_status_.control_mode = "regulate";
     // Additional test commands go here
     // Test commands can be anything you want! Talk to as many custom nodes as desired.
 //******************************************************************************************************
-void PrimaryNodelet::RunTest2(ros::NodeHandle *nh){
+void PrimaryNodelet::RunTest6(ros::NodeHandle *nh){
     /* RATTLE test: hand off control to RATTLE coordinator
     */
 ROS_INFO("Test 2 -- Worst Estimate -- MPC");
@@ -446,7 +446,7 @@ primary_status_.control_mode = "regulate";
     base_status_.test_finished = true;
 }
 
-void PrimaryNodelet::RunTest5(ros::NodeHandle *nh){
+void PrimaryNodelet::RunTest1(ros::NodeHandle *nh){
     /*  Best estimate TRMPC
     */
  ROS_INFO("Test 5  TRMPC -- Best Estimate -- status -- <<< Initiated >>> ");
@@ -553,7 +553,7 @@ primary_status_.control_mode = "regulate";
 }
 
 
-void PrimaryNodelet::RunTest6(ros::NodeHandle *nh){
+void PrimaryNodelet::RunTest2(ros::NodeHandle *nh){
     /*  Best estimate MPC
     */
 ROS_INFO("Test 6  MPC -- Best Estimate -- status -- <<< Initiated >>>");
