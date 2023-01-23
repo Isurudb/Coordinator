@@ -99,6 +99,10 @@ primary_status_.control_mode = "regulate";
         float u_y = kN[1];//]Fy;//arg_fy;//-13.5*velocity_.y -0.85*position_error.y;
         float u_z = kN[2];//Fz;//arg_fz;//-1.0*velocity_.z -0.1*position_error.z;
 
+        
+
+        
+
         float f_max=0.6;
         float f_min=-0.6;
 
@@ -132,15 +136,24 @@ primary_status_.control_mode = "regulate";
             ctl_input.force.z = u_x*R_13 + u_y*R_23 + u_z*R_33;//-0.05*velocity_.z +0.005*position_error.z;
             
         
-        
+        float ex =position_error.x;
+        float ey =position_error.y;
+        float ez =position_error.z;
        
          
          if(t==60){ 
+         if(sqrt(ex*ex+ey*ey+ez*ez)<0.1*sqrt(2))
+            {
+            ROS_INFO(" ---------------------------------------Goal Position arrived--------------------------------");
+        }
+        else{
         ROS_INFO(" Deploying TRMPC for transverse motion  ex: [%f]  ey: [%f] ez: [%f]\n Fx: [%f] Fy: [%f] Fz: [%f] ",
             position_error.x, position_error.y, position_error.z,ctl_input.force.x,ctl_input.force.y,ctl_input.force.z);
            
         ROS_INFO("qx: [%f]  qy: [%f] qz: [%f] qw: [%f]", q_e.getX()*q_e.getX(),q_e.getY()*q_e.getY(),q_e.getZ()*q_e.getZ(),q_e.getW());
+        }
          t=0;
+        
          }
 
         gnc_setpoint.header.frame_id="body";
@@ -213,15 +226,23 @@ primary_status_.control_mode = "regulate";
         ctl_input.force.y = u_x*R_12 + u_y*R_22 + u_z*R_32;//-0.05*velocity_.y -0.005*position_error.y;
         ctl_input.force.z = u_x*R_13 + u_y*R_23 + u_z*R_33;//-0.05*velocity_.z +0.005*position_error.z;
             
-        
+        float ex =position_error.x;
+        float ey =position_error.y;
+        float ez =position_error.z;
         
        
          
          if(t==60){ 
+         if(sqrt(ex*ex+ey*ey+ez*ez)<0.1*sqrt(2))
+            {
+            ROS_INFO(" ---------------------------------------Goal Position arrived--------------------------------");
+        }
+         else{  
         ROS_INFO(" Deploying MPC for transverse motion  ex: [%f]  ey: [%f] ez: [%f]\n Fx: [%f] Fy: [%f] Fz: [%f] ",
             position_error.x, position_error.y, position_error.z,ctl_input.force.x,ctl_input.force.y,ctl_input.force.z);
            
         ROS_INFO("qx: [%f]  qy: [%f] qz: [%f] qw: [%f]", q_e.getX()*q_e.getX(),q_e.getY()*q_e.getY(),q_e.getZ()*q_e.getZ(),q_e.getW());
+         }
          t=0;
          }
 
@@ -326,14 +347,22 @@ primary_status_.control_mode = "regulate";
             ctl_input.force.z = u_x*R_13 + u_y*R_23 + u_z*R_33;//-0.05*velocity_.z +0.005*position_error.z;
             
         
-        
+        float ex =position_error.x;
+        float ey =position_error.y;
+        float ez =position_error.z;
        
          
          if(t==60){ 
+        if(sqrt(ex*ex+ey*ey+ez*ez)<0.1*sqrt(2))
+            {
+            ROS_INFO(" ---------------------------------------Goal Position arrived--------------------------------");
+        }
+        else{    
         ROS_INFO(" Deploying TRMPC for transverse motion  ex: [%f]  ey: [%f] ez: [%f]\n Fx: [%f] Fy: [%f] Fz: [%f] ",
             position_error.x, position_error.y, position_error.z,ctl_input.force.x,ctl_input.force.y,ctl_input.force.z);
            
         ROS_INFO("qx: [%f]  qy: [%f] qz: [%f] qw: [%f]", q_e.getX()*q_e.getX(),q_e.getY()*q_e.getY(),q_e.getZ()*q_e.getZ(),q_e.getW());
+        }
          t=0;
          }
 
@@ -406,15 +435,23 @@ primary_status_.control_mode = "regulate";
         ctl_input.force.y = u_x*R_12 + u_y*R_22 + u_z*R_32;//-0.05*velocity_.y -0.005*position_error.y;
         ctl_input.force.z = u_x*R_13 + u_y*R_23 + u_z*R_33;//-0.05*velocity_.z +0.005*position_error.z;
             
-        
+        float ex =position_error.x;
+        float ey =position_error.y;
+        float ez =position_error.z;
         
        
          
          if(t==60){ 
+             if(sqrt(ex*ex+ey*ey+ez*ez)<0.1*sqrt(2))
+            {
+            ROS_INFO(" ---------------------------------------Goal Position arrived--------------------------------");
+        }
+        else{
         ROS_INFO(" Deploying MPC for transverse motion  ex: [%f]  ey: [%f] ez: [%f]\n Fx: [%f] Fy: [%f] Fz: [%f] ",
             position_error.x, position_error.y, position_error.z,ctl_input.force.x,ctl_input.force.y,ctl_input.force.z);
            
         ROS_INFO("qx: [%f]  qy: [%f] qz: [%f] qw: [%f]", q_e.getX()*q_e.getX(),q_e.getY()*q_e.getY(),q_e.getZ()*q_e.getZ(),q_e.getW());
+        }
          t=0;
          }
 
@@ -518,12 +555,24 @@ primary_status_.control_mode = "regulate";
         
        
          
+        float ex =position_error.x;
+        float ey =position_error.y;
+        float ez =position_error.z;
+       
+         
          if(t==60){ 
+            if(sqrt(ex*ex+ey*ey+ez*ez)<0.1*sqrt(2))
+            {
+            ROS_INFO(" ---------------------------------------Goal Position arrived--------------------------------");
+        }
+        else{
         ROS_INFO(" Deploying TRMPC for transverse motion  ex: [%f]  ey: [%f] ez: [%f]\n Fx: [%f] Fy: [%f] Fz: [%f] ",
             position_error.x, position_error.y, position_error.z,ctl_input.force.x,ctl_input.force.y,ctl_input.force.z);
            
         ROS_INFO("qx: [%f]  qy: [%f] qz: [%f] qw: [%f]", q_e.getX()*q_e.getX(),q_e.getY()*q_e.getY(),q_e.getZ()*q_e.getZ(),q_e.getW());
+        }
          t=0;
+        
          }
 
         gnc_setpoint.header.frame_id="body";
@@ -593,14 +642,24 @@ primary_status_.control_mode = "regulate";
         ctl_input.force.z = u_x*R_13 + u_y*R_23 + u_z*R_33;//-0.05*velocity_.z +0.005*position_error.z;
             
         
+        float ex =position_error.x;
+        float ey =position_error.y;
+        float ez =position_error.z;
+       
         
        
          
          if(t==60){ 
+             if(sqrt(ex*ex+ey*ey+ez*ez)<0.1*sqrt(2))
+            {
+            ROS_INFO(" ---------------------------------------Goal Position arrived--------------------------------");
+        }
+        else{
         ROS_INFO(" Deploying MPC for transverse motion  ex: [%f]  ey: [%f] ez: [%f]\n Fx: [%f] Fy: [%f] Fz: [%f] ",
             position_error.x, position_error.y, position_error.z,ctl_input.force.x,ctl_input.force.y,ctl_input.force.z);
            
         ROS_INFO("qx: [%f]  qy: [%f] qz: [%f] qw: [%f]", q_e.getX()*q_e.getX(),q_e.getY()*q_e.getY(),q_e.getZ()*q_e.getZ(),q_e.getW());
+        }
          t=0;
          }
 
