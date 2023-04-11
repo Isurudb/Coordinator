@@ -142,7 +142,7 @@ primary_status_.control_mode = "regulate";
        
          
          if(t==60){ 
-         if(sqrt(ex*ex+ey*ey+ez*ez)<0.1*sqrt(2))
+         if(sqrt(ex*ex+ey*ey+ez*ez)<0.1)
             {
             ROS_INFO(" ---------------------------------------Goal Position arrived--------------------------------");
         }
@@ -233,7 +233,7 @@ primary_status_.control_mode = "regulate";
        
          
          if(t==60){ 
-         if(sqrt(ex*ex+ey*ey+ez*ez)<0.1*sqrt(2))
+         if(sqrt(ex*ex+ey*ey+ez*ez)<0.1)
             {
             ROS_INFO(" ---------------------------------------Goal Position arrived--------------------------------");
         }
@@ -353,7 +353,7 @@ primary_status_.control_mode = "regulate";
        
          
          if(t==60){ 
-        if(sqrt(ex*ex+ey*ey+ez*ez)<0.1*sqrt(2))
+        if(sqrt(ex*ex+ey*ey+ez*ez)<0.1)
             {
             ROS_INFO(" ---------------------------------------Goal Position arrived--------------------------------");
         }
@@ -442,7 +442,7 @@ primary_status_.control_mode = "regulate";
        
          
          if(t==60){ 
-             if(sqrt(ex*ex+ey*ey+ez*ez)<0.1*sqrt(2))
+             if(sqrt(ex*ex+ey*ey+ez*ez)<0.1)
             {
             ROS_INFO(" ---------------------------------------Goal Position arrived--------------------------------");
         }
@@ -561,7 +561,7 @@ primary_status_.control_mode = "regulate";
        
          
          if(t==60){ 
-            if(sqrt(ex*ex+ey*ey+ez*ez)<0.1*sqrt(2))
+            if(sqrt(ex*ex+ey*ey+ez*ez)<0.1)
             {
             ROS_INFO(" ---------------------------------------Goal Position arrived--------------------------------");
         }
@@ -650,7 +650,7 @@ primary_status_.control_mode = "regulate";
        
          
          if(t==60){ 
-             if(sqrt(ex*ex+ey*ey+ez*ez)<0.1*sqrt(2))
+             if(sqrt(ex*ex+ey*ey+ez*ez)<0.1)
             {
             ROS_INFO(" ---------------------------------------Goal Position arrived--------------------------------");
         }
