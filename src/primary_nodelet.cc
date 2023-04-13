@@ -36,8 +36,8 @@ void PrimaryNodelet::Initialize(ros::NodeHandle* nh) {
   sub_ekf_ = nh->subscribe<ff_msgs::EkfState>("queen/gnc/ekf", 5,
     boost::bind(&PrimaryNodelet::ekf_callback, this, _1));
   
-  // services
-  serv_ctl_enable_ = nh->serviceClient<std_srvs::SetBool>(SERVICE_GNC_CTL_ENABLE);
+  // services SERVICE_GNC_CTL_ENABLE
+  serv_ctl_enable_ = nh->serviceClient<std_srvs::SetBool>("/queen/gnc/ctl/enable");
 
   // tracking points
   try{
