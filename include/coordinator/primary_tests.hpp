@@ -18,7 +18,7 @@ void PrimaryNodelet::RunTest0(ros::NodeHandle *nh){
     ROS_INFO("Undocking the Astrobee ");
     NODELET_INFO_STREAM("Calling " << undock_command);
     system_ret = system(undock_command.c_str());
-
+ 
     if(system_ret != 0){
         NODELET_ERROR_STREAM("[PRIMARY/DMPC] Failed to Launch DMPC nodes.");
     }
@@ -86,9 +86,9 @@ primary_status_.control_mode = "regulate";
         }
         else
         {
-            ctl_input.force.x=0;//-0.05*velocity_.x ;
-            ctl_input.force.y=0;//-0.05*velocity_.y ;
-            ctl_input.force.z=0;//-0.05*velocity_.z ;
+           ctl_input.force.x = u_x*R_11 + u_y*R_21 + u_z*R_31;//-0.05*velocity_.x +0.005*position_error.x;
+            ctl_input.force.y = u_x*R_12 + u_y*R_22 + u_z*R_32;//-0.05*velocity_.y -0.005*position_error.y;
+            ctl_input.force.z = u_x*R_13 + u_y*R_23 + u_z*R_33;//-0.05*velocity_.z +0.005*position_error.z;
         }
         
         
