@@ -33,11 +33,11 @@ void PrimaryNodelet::Initialize(ros::NodeHandle* nh) {
     boost::bind(&PrimaryNodelet::test_num_callback, this, _1));
   sub_flight_mode_= nh->subscribe<ff_msgs::FlightMode>(TOPIC_MOBILITY_FLIGHT_MODE, 5,
     boost::bind(&PrimaryNodelet::flight_mode_callback, this, _1));  // flight mode setter
-  sub_ekf_ = nh->subscribe<ff_msgs::EkfState>("gnc/ekf", 5,
+  sub_ekf_ = nh->subscribe<ff_msgs::EkfState>("queen/gnc/ekf", 5,
     boost::bind(&PrimaryNodelet::ekf_callback, this, _1));
   
-  // services
-  serv_ctl_enable_ = nh->serviceClient<std_srvs::SetBool>(SERVICE_GNC_CTL_ENABLE);
+  // services "gnc/ctl/enable"  SERVICE_GNC_CTL_ENABLE
+  serv_ctl_enable_ = nh->serviceClient<std_srvs::SetBool>("/queen/gnc/ctl/enable"); // ID:
 
   // tracking points
   try{
