@@ -8,7 +8,7 @@
 void PrimaryNodelet::RunTest0(ros::NodeHandle *nh){
     int system_ret;
     std::string undock_command;
-     undock_command = "rosrun dock dock_tool -undock";
+     undock_command = "rosrun dock dock_tool -undock -ns 'queen'";
     NODELET_INFO_STREAM("[PRIMARY_COORD]: Congratulations, you have passed quick checkout. " 
     "May your days be blessed with only warnings and no errors.");
     
@@ -31,10 +31,10 @@ void PrimaryNodelet::RunTest0(ros::NodeHandle *nh){
     // pub_ctl_=nh->advertise<ff_msgs::FamCommand>(TOPIC_GNC_CTL_CMD,1);
     
 
-    RunTest1(nh);
+    //RunTest1(nh);
 
     NODELET_DEBUG_STREAM("[PRIMARY COORD]: ...test complete!");
-    base_status_.test_finished = true;
+ base_status_.test_finished = false;
 };
 
 
@@ -42,7 +42,7 @@ void PrimaryNodelet::RunTest0(ros::NodeHandle *nh){
 void PrimaryNodelet::RunTest1(ros::NodeHandle *nh){
     /* RATTLE test: hand off control to RATTLE coordinator
     */
-
+    RunTest0(nh);
     ROS_INFO("Runnig Test 1 now ");
 primary_status_.control_mode = "regulate";
     ros::Duration(0.4).sleep(); // make sure controller gets the regulate settings before disabling default controller.
@@ -92,7 +92,7 @@ primary_status_.control_mode = "regulate";
         }
         
         
-        //ROS_INFO("qx: [%f]  qy: [%f] qz: [%f] qw: [%f]", q_e.getX()*q_e.getX(),q_e.getY()*q_e.getY(),q_e.getZ()*q_e.getZ(),q_e.getW());
+        ROS_INFO("qx: [%f]  qy: [%f] qz: [%f] qw: [%f]", q_e.getX()*q_e.getX(),q_e.getY()*q_e.getY(),q_e.getZ()*q_e.getZ(),q_e.getW());
 
 
         gnc_setpoint.header.frame_id="body";

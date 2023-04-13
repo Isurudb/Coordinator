@@ -57,7 +57,7 @@ Every test has a test#() function available in case it is needed by asap.py
 #include <math.h>
 static std::string TOPIC_ASAP_STATUS = "asap/status";
 static std::string TOPIC_ASAP_TEST_NUMBER = "asap/test_number";
-static std::string TOPIC_GNC_CTL_CMD = "gnc/ctl/command";
+static std::string TOPIC_GNC_CTL_CMD = "queen/gnc/ctl/command";
 
 
 // base status struct (key information)
