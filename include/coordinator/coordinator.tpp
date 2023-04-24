@@ -124,7 +124,7 @@ class CoordinatorBase
   ff_msgs::FamCommand gnc_setpoint;
 
   geometry_msgs::Wrench ctl_input;
-  geometry_msgs::Quaternion attitude;
+  geometry_msgs::Quaternion attitude, Q_ref;
   geometry_msgs::Vector3 omega,velocity_, position_, position_error, position_ref;
   tf2::Quaternion attitude_,q_ref,q_e,q_ref_inv;
 
@@ -543,7 +543,12 @@ void CoordinatorBase<T>::ekf_callback(const ff_msgs::EkfState::ConstPtr msg) {
     axes_rot.y = 0;
     axes_rot.z = 1;
     double angle = 45/180*3.14570; */
-        q_ref.setRPY(r, p, y);
+        //q_ref.setRPY(r, p, y);
+        Q_ref.x=0.0;
+        Q_ref.y=0.0;
+        Q_ref.z=0.0;
+        Q_ref.w=1.0;
+        tf2::convert(Q_ref,q_ref);
         //q_ref.setRotation(axes_rot, 45/180*3.14570);
         tf2::convert(attitude,attitude_);
         q_ref_inv=q_ref.inverse();//
@@ -571,8 +576,8 @@ void CoordinatorBase<T>::ekf_callback(const ff_msgs::EkfState::ConstPtr msg) {
     /* position_ref.x = 10.8333388725;
     position_ref.y = -9.41988714508+0.5;
     position_ref.z = 4.20110343832;  */
-
-  if(initialzation){
+//initialzation
+  if(true){
     position_error.x = position_.x - position_ref.x;
     position_error.y = position_.y - position_ref.y;
     position_error.z = position_.z - position_ref.z;
