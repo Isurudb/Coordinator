@@ -8,3 +8,6 @@ bool test_finished
 bool coord_ok
 
 # StatusSecondary
+string control_mode  # did something break?
+bool regulate_finished
+string description  # for telemetry description
