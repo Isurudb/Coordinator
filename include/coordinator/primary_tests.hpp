@@ -8,7 +8,7 @@
 void PrimaryNodelet::RunTest0(ros::NodeHandle *nh){
     int system_ret;
     std::string undock_command;
-     undock_command = "rosrun dock dock_tool -undock -ns 'queen'";
+     undock_command = "rosrun executive teleop_tool -move -relative -pos '-0.03 0.02 0.035' -ns 'queen'";//"rosrun dock dock_tool -undock -ns 'queen'";
     NODELET_INFO_STREAM("[PRIMARY_COORD]: Congratulations, you have passed quick checkout. " 
     "May your days be blessed with only warnings and no errors.");
     

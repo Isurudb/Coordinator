@@ -55,10 +55,12 @@ Every test has a test#() function available in case it is needed by asap.py
 #include <string.h>
 #include <sstream>
 #include <math.h>
-static std::string TOPIC_ASAP_STATUS = "asap/status";
-static std::string TOPIC_ASAP_TEST_NUMBER = "asap/test_number";
-static std::string TOPIC_GNC_CTL_CMD = "queen/gnc/ctl/command";
-
+static std::string TOPIC_ASAP_STATUS = "/queen/asap/status";//"/queen/asap/status";
+static std::string TOPIC_ASAP_TEST_NUMBER = "/queen/asap/test_number";//"/queen/asap/test_number";
+static std::string TOPIC_ASAP_STATUS_s = "/bumble/asap/status";
+static std::string TOPIC_ASAP_TEST_NUMBER_s = "/bumble/asap/test_number";
+static std::string TOPIC_GNC_CTL_CMD = "/queen/gnc/ctl/command"; //"/queen/gnc/ctl/command";
+static std::string TOPIC_GNC_CTL_CMD_s = "/bumble/gnc/ctl/command";
 
 // base status struct (key information)
 struct BaseStatus {
