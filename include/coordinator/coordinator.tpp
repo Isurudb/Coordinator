@@ -136,6 +136,8 @@ class CoordinatorBase {
 
   void debug();
 
+  bool run_test_0=false;
+
   // Astrobee GNC interface
   void disable_default_ctl_callback(const ros::TimerEvent&);
   void disable_default_ctl();
@@ -386,11 +388,13 @@ void CoordinatorBase<T>::ekf_callback(const ff_msgs::EkfState::ConstPtr msg) {
     position_.y = py;
     position_.z = pz;
 
+    if (! run_test_0){
+
     position_ref.x = 10.8333388725;
     position_ref.y = -9.41988714508+0.5;
     position_ref.z = 4.20110343832; 
 
-
+}
     position_error.x = position_.x - position_ref.x;
     position_error.y = position_.y - position_ref.y;
     position_error.z = position_.z - position_ref.z;

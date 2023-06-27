@@ -8,7 +8,7 @@
 void SecondaryNodelet::RunTest0(ros::NodeHandle *nh){
     int system_ret;
     std::string undock_command;
-     undock_command = "rosrun executive teleop_tool -move -relative -pos '-0.03 0.02 0.035' -ns 'bumble'";//"rosrun dock dock_tool -undock -ns 'queen'";
+     undock_command = "rosrun executive teleop_tool -move -att '1.5 0 0 1' -ns 'bumble'";//"rosrun dock dock_tool -undock -ns 'queen'";
     NODELET_INFO_STREAM("[SECONDARY_COORD]: Congratulations, you have passed quick checkout. " 
     "May your days be blessed with only warnings and no errors.");
     
@@ -32,9 +32,13 @@ void SecondaryNodelet::RunTest0(ros::NodeHandle *nh){
     
 
     //RunTest1(nh);
-
-    NODELET_DEBUG_STREAM("[SECONDARY COORD]: ...test complete!");
- base_status_.test_finished = false;
+ position_ref.x = position_.x + 0;
+    position_ref.y = position_.y + 3.0;
+    position_ref.z = position_.z; +0;
+     run_test_0=true;
+    NODELET_DEBUG_STREAM("[PRIMARY COORD]: ...test complete!");
+    ROS_INFO("New Goal positions are x: %f y: %f z: %f",position_ref.x,position_ref.y,position_ref.z); 
+    base_status_.test_finished = false;
 };
 
 
