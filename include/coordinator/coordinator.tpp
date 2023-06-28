@@ -336,7 +336,7 @@ void CoordinatorBase<T>::Run(ros::NodeHandle *nh) {
       else if (base_status_.test_number  == 1) {
         RunTest1(nh);
       }
-      else if(base_status_.test_number  == 2) {
+     /*  else if(base_status_.test_number  == 2) {
         RunTest2(nh);
       }
       else if(base_status_.test_number  == 3) {
@@ -350,7 +350,7 @@ void CoordinatorBase<T>::Run(ros::NodeHandle *nh) {
       }
       else if(base_status_.test_number  == 6) {
         RunTest6(nh);
-      }
+      } */
       // add additional test checks here
 
       base_status_.test_finished = true;
