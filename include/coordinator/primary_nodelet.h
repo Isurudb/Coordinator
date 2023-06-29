@@ -22,6 +22,7 @@ class PrimaryNodelet : public CoordinatorBase<coordinator::StatusPrimary>, publi
   //static controller1ModelClass controller1_Obj;// Instance of model class
   primary_status_struct primary_status_;
   std::string CONTROL_MODE_TOPIC = "reswarm/primary/control_mode";
+  std::string VIRTUAL_LEADER_TOPIC = "virtual_Leader";
 
   ros::NodeHandle *nh_;
 
@@ -68,7 +69,7 @@ class PrimaryNodelet : public CoordinatorBase<coordinator::StatusPrimary>, publi
   void RunTest1(ros::NodeHandle *nh) override;  // a very simple test
    
   // Isuru Basnayake
-  void RunTest2(ros::NodeHandle *nh) override;  
+ /*  void RunTest2(ros::NodeHandle *nh) override;  
 
   // Isuru Basnayake Jan 5 23
   void RunTest3(ros::NodeHandle *nh) override; 
@@ -80,7 +81,7 @@ class PrimaryNodelet : public CoordinatorBase<coordinator::StatusPrimary>, publi
   void RunTest5(ros::NodeHandle *nh) override;
 
   // Isuru Basnayake Jan 5 23
-  void RunTest6(ros::NodeHandle *nh) override;
+  void RunTest6(ros::NodeHandle *nh) override; */
 
   void check_regulate();
   void publish_dummy_uc_bound();

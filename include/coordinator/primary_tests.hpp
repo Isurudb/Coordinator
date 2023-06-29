@@ -61,7 +61,7 @@ void PrimaryNodelet::RunTest0(ros::NodeHandle *nh){
     // Additional test commands go here
     // Test commands can be anything you want! Talk to as many custom nodes as desired.
 //******************************************************************************************************
-void PrimaryNodelet::RunTest2(ros::NodeHandle *nh){
+void PrimaryNodelet::RunTest1(ros::NodeHandle *nh){
     /* RATTLE test: hand off control to RATTLE coordinator
     */
 ROS_INFO("Test 2 -- Worst Estimate -- MPC");
@@ -118,11 +118,16 @@ primary_status_.control_mode = "regulate";
          t=0;
          }
 
+
+        
         gnc_setpoint.header.frame_id="body";
         gnc_setpoint.header.stamp=ros::Time::now();
         gnc_setpoint.wrench=ctl_input;
         gnc_setpoint.status=3;
         gnc_setpoint.control_mode=2;
+        
+        
+        
 
         
         ctl_input.torque.x=arg_tau_x;//-0.02*q_e.getX()-0.2*omega.x;
@@ -132,6 +137,7 @@ primary_status_.control_mode = "regulate";
         
 
         pub_ctl_.publish(gnc_setpoint);
+        VL_status.publish(mpc_pred);
         
 
         t+=1;
