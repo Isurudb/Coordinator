@@ -23,6 +23,7 @@ void PrimaryNodelet::Initialize(ros::NodeHandle* nh) {
   pub_flight_mode_ = nh->advertise<ff_msgs::FlightMode>(TOPIC_MOBILITY_FLIGHT_MODE, 1, true);  // FlightMode
   pub_status_ = nh->advertise<coordinator::StatusPrimary>(TOPIC_ASAP_STATUS, 5, true);
   pub_ctl_=nh->advertise<ff_msgs::FamCommand>(TOPIC_GNC_CTL_CMD,1);
+  VL_status=nh->advertise<coordinator::Prediction>(VIRTUAL_LEADER_TOPIC,1);
   
   // subscribers
   sub_flight_mode_= nh->subscribe<ff_msgs::FlightMode>(TOPIC_MOBILITY_FLIGHT_MODE, 5,
