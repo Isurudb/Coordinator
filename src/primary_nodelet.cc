@@ -36,7 +36,10 @@ void PrimaryNodelet::Initialize(ros::NodeHandle* nh) {
     boost::bind(&PrimaryNodelet::flight_mode_callback, this, _1));  // flight mode setter
   sub_ekf_ = nh->subscribe<ff_msgs::EkfState>("gnc/ekf", 5,
     boost::bind(&PrimaryNodelet::ekf_callback, this, _1));
-  
+  sub_VL_status= nh->subscribe<coordinator::Prediction>(VIRTUAL_LEADER_TOPIC, 5,
+    boost::bind(&PrimaryNodelet::VL_callback, this, _1));
+
+
   // services
   serv_ctl_enable_ = nh->serviceClient<std_srvs::SetBool>(SERVICE_GNC_CTL_ENABLE);
 

@@ -116,6 +116,7 @@ class CoordinatorBase
   ros::Subscriber sub_flight_mode_;
   ros::Subscriber sub_ekf_;
   ros::Subscriber sub_test_number_;
+  ros::Subscriber sub_VL_status;
 
   ros::ServiceClient serv_ctl_enable_;
 
@@ -130,7 +131,7 @@ class CoordinatorBase
 
   geometry_msgs::Wrench ctl_input;
   geometry_msgs::Quaternion attitude;
-  geometry_msgs::Vector3 omega,velocity_, position_, position_error, position_ref;
+  geometry_msgs::Vector3 omega,velocity_, position_, position_error, position_ref,velocity;
   tf2::Quaternion attitude_,q_ref,q_e,q_ref_inv;
 
   // Parameters
@@ -157,6 +158,7 @@ class CoordinatorBase
   void test_num_callback(const coordinator::TestNumber::ConstPtr msg);
   void flight_mode_callback(const ff_msgs::FlightMode::ConstPtr msg);
   void ekf_callback(const ff_msgs::EkfState::ConstPtr msg);
+  void VL_callback(const coordinator::Prediction::ConstPtr  msg);
 
   void debug();
 
@@ -587,9 +589,9 @@ void CoordinatorBase<T>::ekf_callback(const ff_msgs::EkfState::ConstPtr msg) {
     position_error.y = position_.y - position_ref.y;
     position_error.z = position_.z - position_ref.z;
 
-    velocity_.x=vx;
-    velocity_.y=vy;
-    velocity_.z=vz;
+    velocity_.x=vx - velocity.x;
+    velocity_.y=vy - velocity.y;
+    velocity_.z=vz - velocity.z;
 
   
 
@@ -678,24 +680,7 @@ void CoordinatorBase<T>::ekf_callback(const ff_msgs::EkfState::ConstPtr msg) {
     //if(Estimate_status=="Worst"){
      //MPC_Guidance_v3_sand_worst();
      MPC();
-     vl_pred();
-    mpc_pred.x1.x=x_pred[0];    mpc_pred.x1.y=x_pred[1];    mpc_pred.x1.z=x_pred[2];
-    mpc_pred.v1.x=x_pred[3];    mpc_pred.v1.y=x_pred[4];    mpc_pred.v1.z=x_pred[5];
-
-    mpc_pred.x2.x=x_pred[6];    mpc_pred.x2.y=x_pred[7];    mpc_pred.x2.z=x_pred[8];
-    mpc_pred.v2.x=x_pred[9];    mpc_pred.v2.y=x_pred[10];    mpc_pred.v2.z=x_pred[11];
-
-    mpc_pred.x3.x=x_pred[12];    mpc_pred.x3.y=x_pred[13];    mpc_pred.x3.z=x_pred[14];
-    mpc_pred.v3.x=x_pred[15];    mpc_pred.v3.y=x_pred[16];    mpc_pred.v3.z=x_pred[17];
-
-    mpc_pred.x4.x=x_pred[18];    mpc_pred.x4.y=x_pred[19];    mpc_pred.x4.z=x_pred[20];
-    mpc_pred.v4.x=x_pred[21];    mpc_pred.v4.y=x_pred[22];    mpc_pred.v4.z=x_pred[23];
-
-    mpc_pred.x5.x=x_pred[24];    mpc_pred.x5.y=x_pred[25];    mpc_pred.x5.z=x_pred[26];
-    mpc_pred.v5.x=x_pred[27];    mpc_pred.v5.y=x_pred[28];    mpc_pred.v5.z=x_pred[29];
-
-    mpc_pred.x6.x=x_pred[30];    mpc_pred.x6.y=x_pred[31];    mpc_pred.x6.z=x_pred[32];
-    mpc_pred.v6.x=x_pred[33];    mpc_pred.v6.y=x_pred[34];    mpc_pred.v6.z=x_pred[35];
+    
     //}
     // // TRMPC Inbound <<<<<<<<<<<<<<<<<<<<<<<<<<<<ID
     // v_mpc[0]=Fx;
@@ -769,6 +754,16 @@ void CoordinatorBase<T>::ekf_callback(const ff_msgs::EkfState::ConstPtr msg) {
 }
 
 
+template<typename T>
+void CoordinatorBase<T>::VL_callback(const coordinator::Prediction::ConstPtr msg){
+  position_ref.x = msg->x1.x;
+  position_ref.y = msg->x1.y;
+  position_ref.z = msg->x1.z;
+  velocity.x = msg->v1.x;
+  velocity.y = msg->v1.y;
+  velocity.z = msg->v1.z;
+
+};
 /* ************************************************************************** */
 template<typename T>
 void CoordinatorBase<T>::debug(){
