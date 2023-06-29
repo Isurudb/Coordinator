@@ -1,137 +1,136 @@
 #pragma once
 #include "coordinator/secondary_nodelet.h"
-#include <typeinfo>
+//#include "std_msgs/String.h"
 
+
+
+/************************************************************************/
 void SecondaryNodelet::RunTest0(ros::NodeHandle *nh){
-    NODELET_INFO_STREAM("[SECODNARY COORD]: Congratulations, you have passed quick checkout. " 
-    "May your days be blessed with only warnings and no errors.");
-    ros::Duration(5.0).sleep();
-};
-
-void SecondaryNodelet::RunTest1(ros::NodeHandle *nh){
-    RunDMPC(nh);
-    NODELET_INFO_STREAM("Test 1 finished cleanly!");
-};
-
-void SecondaryNodelet::RunTest2(ros::NodeHandle *nh){
-    RunDMPC(nh);
-    NODELET_INFO_STREAM("Test 2 finished cleanly!");
-};
-
-void SecondaryNodelet::RunTest3(ros::NodeHandle *nh){
-    RunDMPC(nh);
-    NODELET_INFO_STREAM("Test 3 finished cleanly!");
-};
-
-void SecondaryNodelet::RunDMPC(ros::NodeHandle *nh){
-    load_params();
-    LaunchDMPC();
-
-    NODELET_INFO_STREAM("Create variables...");
-    std::string start_service_str;
-    ros::ServiceClient start_service;
-
-    NODELET_INFO_STREAM("Preparing service call...");
-    start_service_str = "/";
-    if(sim_) start_service_str.append("bumble/");
-    start_service_str.append("start");
-    
-    NODELET_INFO_STREAM("Creating client...");
-    start_service = nh->serviceClient<std_srvs::SetBool>(start_service_str.c_str());
-    
-    NODELET_INFO_STREAM("Waiting for service to be alive...");
-    start_service.waitForExistence();
-    
-    // Start test
-    std_srvs::SetBool start_srv_req;
-    start_srv_req.request.data = true;
-    NODELET_INFO_STREAM("Calling service: " << start_service_str);
-    start_service.call(start_srv_req);
-    if(!start_srv_req.response.success) ROS_ERROR_STREAM("Failed to start test!");
-
-    // Wait for termination
-    ros::Rate wait_for_test(1.0);
-    secondary_reswarm_status_.test_finished = false;
-    while(ros::ok() && secondary_reswarm_status_.test_finished != true) wait_for_test.sleep();
-
-    // Kill nodes
-    KillDMPC();
-}
-
-void SecondaryNodelet::LaunchDMPC(){
     int system_ret;
-    std::string launch_command;
-
-    // Parse test number
-    launch_command = "roslaunch reswarm_dmpc secondary_";
-    if (base_reswarm_status_.test_number == 1 ||
-          (base_reswarm_status_.test_number >= 100 && base_reswarm_status_.test_number <= 199) ||
-          (base_reswarm_status_.test_number >= 10000 && base_reswarm_status_.test_number <= 19999)){
-        launch_command.append("t1.launch ");
-    }else if(base_reswarm_status_.test_number == 2 ||
-          (base_reswarm_status_.test_number >= 200 && base_reswarm_status_.test_number <= 299) ||
-          (base_reswarm_status_.test_number >= 20000 && base_reswarm_status_.test_number <= 29999)) {
-        launch_command.append("t2.launch ");
-    }else if (base_reswarm_status_.test_number == 3 ||
-          (base_reswarm_status_.test_number >= 300 && base_reswarm_status_.test_number <= 399) ||
-          (base_reswarm_status_.test_number >= 30000 && base_reswarm_status_.test_number <= 39999) ) {
-        launch_command.append("t3.launch ");
-    }else{
-        NODELET_ERROR_STREAM("Wrong DMPC Test Number!");
-        return;
-    }
-
-    // Add argument for weights configuration, main test number (1, 2, 3) is the best weights
-    launch_command = launch_command.append("param:=");
-    launch_command = launch_command.append(std::to_string(base_reswarm_status_.test_number));
-    launch_command = launch_command.append(" ");
-
-    // Check for HW/SIM and GND/ISS - defaults values: nspace:=/ , ground:=true
-    if(sim_){
-        launch_command = launch_command.append("nspace:=/bumble ");
-    }
-
-    if(ground_){
-        launch_command = launch_command.append("ground:=true ");
-    }
-
-    if(ground_ && !sim_){
-        launch_command = launch_command.append("partner:=bsharp ");
-    }
-
-    // Non-blocking system call
-    launch_command.append("&");
+    std::string undock_command;
+     undock_command = "rosrun executive teleop_tool -move -att '1.5 0 0 1' -ns 'bumble'";//"rosrun dock dock_tool -undock -ns 'queen'";
+    NODELET_INFO_STREAM("[SECONDARY_COORD]: Congratulations, you have passed quick checkout. " 
+    "May your days be blessed with only warnings and no errors.");
     
-    NODELET_INFO_STREAM("Calling " << launch_command);
-    system_ret = system(launch_command.c_str());
+
+    
+    ros::Duration(5.0).sleep();
+    ROS_INFO("Undocking the Astrobee ");
+    NODELET_INFO_STREAM("Calling " << undock_command);
+    system_ret = system(undock_command.c_str());
+ 
     if(system_ret != 0){
         NODELET_ERROR_STREAM("[SECONDARY/DMPC] Failed to Launch DMPC nodes.");
     }
-    return;
+    ROS_INFO("Rotate the previous pose by 180* about Z ....");
+
+    //disable_default_ctl();
+    //check_regulate();  // check regulation until satisfied
+    //ROS_INFO("Setting up the publisher ");
+
+    // pub_ctl_=nh->advertise<ff_msgs::FamCommand>(TOPIC_GNC_CTL_CMD,1);
+    
+
+    //RunTest1(nh);
+ position_ref.x = position_.x + 0;
+    position_ref.y = position_.y + 3.0;
+    position_ref.z = position_.z; +0;
+     //run_test_0=true;
+    NODELET_DEBUG_STREAM("[PRIMARY COORD]: ...test complete!");
+    ROS_INFO("New Goal positions are x: %f y: %f z: %f",position_ref.x,position_ref.y,position_ref.z); 
+    base_status_.test_finished = false;
 };
 
-void SecondaryNodelet::KillDMPC(){
-    int system_ret;
 
-    if(sim_){
-        system_ret = system("rosnode kill /bumble/secondary_dmpc_iface /bumble/secondary_dmpc_ctl_node &");
-    }else{
-        system_ret = system("rosnode kill /secondary_dmpc_iface /secondary_dmpc_ctl_node &");
-    }
+/************************************************************************/
+void SecondaryNodelet::RunTest1(ros::NodeHandle *nh){
+    /* RATTLE test: hand off control to RATTLE coordinator
+    */
+    RunTest0(nh);
+    ROS_INFO("Runnig Test 1 now ");
+secondary_status_.control_mode = "regulate";
+    ros::Duration(0.4).sleep(); // make sure controller gets the regulate settings before disabling default controller.
+    // geometry_msgs::Vector3 torque;
+    // double r=0, p=0, y=3.14159;  // Rotate the previous pose by 180* about Z
 
-    if(system_ret != 0){
-        NODELET_ERROR_STREAM("[SECONDARY/DMPC] Failed to Kill DMPC nodes.");
-    }
-};
+    //     q_ref.setRPY(r, p, y);
+    //     tf2::convert(attitude,attitude_);
+    //     q_ref_inv=q_ref;//.inverse();
+    NODELET_DEBUG_STREAM("[SECONDARY COORD]: Disabling default controller...");
+    disable_default_ctl();
+ ROS_INFO("Initiating the Quaternion Feedback Controller");
+    ros::Rate loop_rate(62.5);
+ ROS_INFO("Setting up the publisher ");
+    while(ros::ok()){
+        
+        // q_e= q_ref_inv*attitude_;  // Calculate the new orientation
+        // q_e.normalize();
+        float R_11 = 2*(attitude.x*attitude.x + attitude.w*attitude.w)-1;
+        float R_12 = 2*(attitude.x*attitude.y - attitude.w*attitude.z);
+        float R_13 = 2*(attitude.x*attitude.z + attitude.w*attitude.y); 
+        float R_21 = 2*(attitude.x*attitude.y + attitude.w*attitude.z);
+        float R_22 = 2*(attitude.y*attitude.y + attitude.w*attitude.w)-1;
+        float R_23 = 2*(attitude.y*attitude.z - attitude.w*attitude.x);
+        float R_31 = 2*(attitude.x*attitude.z - attitude.w*attitude.y); 
+        float R_32 = 2*(attitude.y*attitude.z + attitude.w*attitude.x);
+        float R_33 = 2*(attitude.z*attitude.z + attitude.w*attitude.w)-1;
+
+        float u_x = -13.5*velocity_.x -0.85*position_error.x;
+        float u_y = -13.5*velocity_.y -0.85*position_error.y;
+        float u_z = -1.0*velocity_.z -0.1*position_error.z;
+
+
+
+        if (sqrt(q_e.getX()*q_e.getX()+q_e.getY()*q_e.getY()+q_e.getZ()*q_e.getZ())<0.05)
+        {
+            ROS_INFO(" Attained the pose and initiating  PD for transverse motion  ex: [%f]  ey: [%f] ez: [%f]",position_error.x, position_error.y, position_error.z);
+            ctl_input.force.x = u_x*R_11 + u_y*R_21 + u_z*R_31;//-0.05*velocity_.x +0.005*position_error.x;
+            ctl_input.force.y = u_x*R_12 + u_y*R_22 + u_z*R_32;//-0.05*velocity_.y -0.005*position_error.y;
+            ctl_input.force.z = u_x*R_13 + u_y*R_23 + u_z*R_33;//-0.05*velocity_.z +0.005*position_error.z;
+        }
+        else
+        {
+           ctl_input.force.x = u_x*R_11 + u_y*R_21 + u_z*R_31;//-0.05*velocity_.x +0.005*position_error.x;
+            ctl_input.force.y = u_x*R_12 + u_y*R_22 + u_z*R_32;//-0.05*velocity_.y -0.005*position_error.y;
+            ctl_input.force.z = u_x*R_13 + u_y*R_23 + u_z*R_33;//-0.05*velocity_.z +0.005*position_error.z;
+        }
+        
+        
+        ROS_INFO("qx: [%f]  qy: [%f] qz: [%f] qw: [%f]", q_e.getX()*q_e.getX(),q_e.getY()*q_e.getY(),q_e.getZ()*q_e.getZ(),q_e.getW());
+
+
+        gnc_setpoint.header.frame_id="body";
+        gnc_setpoint.header.stamp=ros::Time::now();
+        gnc_setpoint.wrench=ctl_input;
+        gnc_setpoint.status=3;
+        gnc_setpoint.control_mode=2;
+
+        
+        ctl_input.torque.x=-0.02*q_e.getX()-0.2*omega.x;
+        ctl_input.torque.y=-0.02*q_e.getY()-0.2*omega.y;
+        ctl_input.torque.z=-0.02*q_e.getZ()-0.2*omega.z;
+
+        pub_ctl_.publish(gnc_setpoint);
+        loop_rate.sleep();
+
+        ros::spinOnce();
+
+
+
+    };
+    
+
+    // Additional test commands go here
+    // Test commands can be anything you want! Talk to as many custom nodes as desired.
+
+    NODELET_DEBUG_STREAM("[SECONDARY COORD]: ...test complete!");
+    base_status_.test_finished = true;
+}
 
 
 /* ************************************************************************** */
-void SecondaryNodelet::dmpc_status_cb(const reswarm_dmpc::DMPCTestStatusStamped::ConstPtr msg){
-
-    // Updated internal variables with received status
-    secondary_reswarm_status_.test_finished = msg->test_finished;
-    secondary_reswarm_status_.solver_status = msg->solver_status;
-    secondary_reswarm_status_.cost_value = msg->cost_value;
-    secondary_reswarm_status_.kkt_value = msg->kkt_value;
-    secondary_reswarm_status_.sol_time = msg->sol_time;
+void SecondaryNodelet::control_mode_callback(const std_msgs::String::ConstPtr msg) {
+    /* Update control_mode form an external node.
+    */
+    secondary_status_.control_mode = msg->data;
 }

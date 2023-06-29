@@ -75,7 +75,9 @@ Every test has a test#() function available in case it is needed by asap.py
 static std::string TOPIC_ASAP_STATUS = "asap/status";
 static std::string TOPIC_ASAP_TEST_NUMBER = "asap/test_number";
 static std::string TOPIC_GNC_CTL_CMD = "gnc/ctl/command";
-
+static std::string TOPIC_ASAP_STATUS_s = "/bumble/asap/status";
+static std::string TOPIC_ASAP_TEST_NUMBER_s = "/bumble/asap/test_number";
+static std::string TOPIC_GNC_CTL_CMD_s = "/bumble/gnc/ctl/command";
 
 
 
@@ -158,7 +160,7 @@ class CoordinatorBase
   void test_num_callback(const coordinator::TestNumber::ConstPtr msg);
   void flight_mode_callback(const ff_msgs::FlightMode::ConstPtr msg);
   void ekf_callback(const ff_msgs::EkfState::ConstPtr msg);
-  void VL_callback(const coordinator::Prediction::ConstPtr  msg);
+  // void VL_callback(const coordinator::Prediction::ConstPtr  msg);
 
   void debug();
 
@@ -754,16 +756,16 @@ void CoordinatorBase<T>::ekf_callback(const ff_msgs::EkfState::ConstPtr msg) {
 }
 
 
-template<typename T>
-void CoordinatorBase<T>::VL_callback(const coordinator::Prediction::ConstPtr msg){
-  position_ref.x = msg->x1.x;
-  position_ref.y = msg->x1.y;
-  position_ref.z = msg->x1.z;
-  velocity.x = msg->v1.x;
-  velocity.y = msg->v1.y;
-  velocity.z = msg->v1.z;
+// template<typename T>
+// void CoordinatorBase<T>::VL_callback(const coordinator::Prediction::ConstPtr msg){
+//   position_ref.x = msg->x1.x;
+//   position_ref.y = msg->x1.y;
+//   position_ref.z = msg->x1.z;
+//   velocity.x = msg->v1.x;
+//   velocity.y = msg->v1.y;
+//   velocity.z = msg->v1.z;
 
-};
+// };
 /* ************************************************************************** */
 template<typename T>
 void CoordinatorBase<T>::debug(){
