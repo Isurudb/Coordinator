@@ -72,9 +72,9 @@ Every test has a test#() function available in case it is needed by asap.py
 
 
 
-static std::string TOPIC_ASAP_STATUS = "asap/status";
-static std::string TOPIC_ASAP_TEST_NUMBER = "asap/test_number";
-static std::string TOPIC_GNC_CTL_CMD = "gnc/ctl/command";
+static std::string TOPIC_ASAP_STATUS = "/queen/asap/status";
+static std::string TOPIC_ASAP_TEST_NUMBER = "/queen/asap/test_number";
+static std::string TOPIC_GNC_CTL_CMD = "/queen/gnc/ctl/command";
 static std::string TOPIC_ASAP_STATUS_s = "/bumble/asap/status";
 static std::string TOPIC_ASAP_TEST_NUMBER_s = "/bumble/asap/test_number";
 static std::string TOPIC_GNC_CTL_CMD_s = "/bumble/gnc/ctl/command";
@@ -134,6 +134,7 @@ class CoordinatorBase
   geometry_msgs::Wrench ctl_input;
   geometry_msgs::Quaternion attitude;
   geometry_msgs::Vector3 omega,velocity_, position_, position_error, position_ref,velocity;
+  geometry_msgs::Vector3 pos_ref2, vel_ref_2,position_error_2;
   tf2::Quaternion attitude_,q_ref,q_e,q_ref_inv;
 
   // Parameters
@@ -143,7 +144,7 @@ class CoordinatorBase
 
   // Stored status parameters
   std::string stored_control_mode_ = "track";  // stored control_mode, set by parameter inputs
-
+  std::string robot ;
   std::string Estimate_status = "Best";
 
   // Ekf state
@@ -160,7 +161,7 @@ class CoordinatorBase
   void test_num_callback(const coordinator::TestNumber::ConstPtr msg);
   void flight_mode_callback(const ff_msgs::FlightMode::ConstPtr msg);
   void ekf_callback(const ff_msgs::EkfState::ConstPtr msg);
-  // void VL_callback(const coordinator::Prediction::ConstPtr  msg);
+  void VL_callback(const coordinator::Prediction::ConstPtr  msg);
 
   void debug();
 
@@ -240,7 +241,7 @@ float arg_x_e = 0.0;
 
 double x0[6];
 double x0_vl[6];
-double x_pred[120];
+double x_pred[120]={0};
 double Fx;
 double Fy;
 double Fz;
@@ -561,8 +562,8 @@ void CoordinatorBase<T>::ekf_callback(const ff_msgs::EkfState::ConstPtr msg) {
         //q_ref.setRotation(axes_rot, 45/180*3.14570);
         tf2::convert(attitude,attitude_);
         q_ref_inv=q_ref.inverse();//
-  q_e= q_ref_inv*attitude_;  // Calculate the new orientation
-  q_e.normalize();
+        q_e= q_ref_inv*attitude_;  // Calculate the new orientation
+        q_e.normalize();
         float R_11 = 2*(attitude.x*attitude.x + attitude.w*attitude.w)-1;
         float R_12 = 2*(attitude.x*attitude.y - attitude.w*attitude.z);
         float R_13 = 2*(attitude.x*attitude.z + attitude.w*attitude.y); 
@@ -591,9 +592,17 @@ void CoordinatorBase<T>::ekf_callback(const ff_msgs::EkfState::ConstPtr msg) {
     position_error.y = position_.y - position_ref.y;
     position_error.z = position_.z - position_ref.z;
 
-    velocity_.x=vx - velocity.x;
+    /* velocity_.x=vx - velocity.x;
     velocity_.y=vy - velocity.y;
-    velocity_.z=vz - velocity.z;
+    velocity_.z=vz - velocity.z; */
+
+    position_error_2.x = position_.x - pos_ref2.x;
+    position_error_2.y = position_.y - pos_ref2.y;
+    position_error_2.z = position_.z - pos_ref2.z;
+
+    velocity_.x=vx - vel_ref_2.x;
+    velocity_.y=vy - vel_ref_2.y;
+    velocity_.z=vz - vel_ref_2.z;
 
   
 
@@ -663,13 +672,65 @@ void CoordinatorBase<T>::ekf_callback(const ff_msgs::EkfState::ConstPtr msg) {
 
     // MPC Controller inbound <<<<<<<<<<<<<<<<<<<<<<<ID
     
-
-      x0[0]=position_error.x;
+      if(robot=="Primary")
+    {  x0[0]=position_error.x;
       x0[1]=position_error.y;
       x0[2]=position_error.z;
       x0[3]=vx;
       x0[4]=vy;
       x0[5]=vz;
+      x0_vl[0]=position_.x;
+      x0_vl[1]=position_.y  -0.8;
+      x0_vl[2]=position_.z;
+      x0_vl[3]=velocity_.x;
+      x0_vl[4]=velocity_.y;
+      x0_vl[5]=velocity_.z;
+      vl_pred();
+      
+      mpc_pred.x0.x = x0_vl[0];         mpc_pred.x0.y = x0_vl[1];       mpc_pred.x0.z = x0_vl[2];
+      mpc_pred.v0.x = x0_vl[3];         mpc_pred.v0.y = x0_vl[4];       mpc_pred.v0.z = x0_vl[5];
+
+
+      mpc_pred.x1.x = x_pred[0];         mpc_pred.x1.y = x_pred[1];       mpc_pred.x1.z = x_pred[2];
+      mpc_pred.v1.x = x_pred[3];         mpc_pred.v1.y = x_pred[4];       mpc_pred.v1.z = x_pred[5];
+
+      mpc_pred.x2.x = x_pred[6];         mpc_pred.x2.y = x_pred[7];       mpc_pred.x2.z = x_pred[8];
+      mpc_pred.v2.x = x_pred[9];         mpc_pred.v2.y = x_pred[10];       mpc_pred.v2.z = x_pred[11];
+
+      mpc_pred.x3.x = x_pred[12];         mpc_pred.x3.y = x_pred[13];       mpc_pred.x3.z = x_pred[14];        
+      mpc_pred.v3.x = x_pred[15];         mpc_pred.v3.y = x_pred[16];       mpc_pred.v3.z = x_pred[17];
+
+      mpc_pred.x4.x = x_pred[18];         mpc_pred.x4.y = x_pred[19];       mpc_pred.x4.z = x_pred[20];
+      mpc_pred.v4.x = x_pred[21];         mpc_pred.v4.y = x_pred[22];       mpc_pred.v4.z = x_pred[23];
+
+      mpc_pred.x5.x = x_pred[24];         mpc_pred.x5.y = x_pred[25];       mpc_pred.x5.z = x_pred[26];
+      mpc_pred.v5.x = x_pred[27];         mpc_pred.v5.y = x_pred[28];       mpc_pred.v5.z = x_pred[29];
+
+      mpc_pred.x6.x = x_pred[30];         mpc_pred.x6.y = x_pred[31];       mpc_pred.x6.z = x_pred[32];
+      mpc_pred.v6.x = x_pred[33];         mpc_pred.v6.y = x_pred[34];       mpc_pred.v6.z = x_pred[35];
+      MPC();
+      }
+       
+
+    else
+      {
+        x0[0]=position_.x - pos_ref2.x;
+      x0[1]=position_.y - pos_ref2.y;
+      x0[2]=position_.z - pos_ref2.z;
+      x0[3]=vx - vel_ref_2.x;
+      x0[4]=vy - vel_ref_2.y;
+      x0[5]=vz - vel_ref_2.z;
+      MPC();
+      
+      }
+      
+
+      
+      
+
+
+
+      
 
       /* x0[0]= tmep_ex;//position_error.x;
       x0[1]= tmep_ey;//position_error.y;
@@ -681,7 +742,7 @@ void CoordinatorBase<T>::ekf_callback(const ff_msgs::EkfState::ConstPtr msg) {
 
     //if(Estimate_status=="Worst"){
      //MPC_Guidance_v3_sand_worst();
-     MPC();
+    
     
     //}
     // // TRMPC Inbound <<<<<<<<<<<<<<<<<<<<<<<<<<<<ID
@@ -750,22 +811,26 @@ void CoordinatorBase<T>::ekf_callback(const ff_msgs::EkfState::ConstPtr msg) {
     //X_QP=X_Qp
    // rt_OneStep();
    //ROS_INFO("ex: [%f]  ey: [%f] ez: [%f] ev_x: [%f] ev_y: [%f] ev_z: [%f]", sx,sy,sz,svx,svy,svz);
+    //ROS_INFO("Yayyy..................");
 
-   // ROS_INFO("fx: [%f]  fy: [%f] fz: [%f] tau_x: [%f] tau_y: [%f] tau_y: [%f]", Fx,Fy,Fz, arg_tau_x,arg_tau_y,arg_tau_z);
+   //ROS_INFO("fx: [%f]  fy: [%f] fz: [%f] tau_x: [%f] tau_y: [%f] tau_y: [%f]", Fx,Fy,Fz, arg_tau_x,arg_tau_y,arg_tau_z);
   }
 }
 
 
-// template<typename T>
-// void CoordinatorBase<T>::VL_callback(const coordinator::Prediction::ConstPtr msg){
-//   position_ref.x = msg->x1.x;
-//   position_ref.y = msg->x1.y;
-//   position_ref.z = msg->x1.z;
-//   velocity.x = msg->v1.x;
-//   velocity.y = msg->v1.y;
-//   velocity.z = msg->v1.z;
+template<typename T>
+void CoordinatorBase<T>::VL_callback(const coordinator::Prediction::ConstPtr msg){
+  //pos_ref2, vel_ref_2;
+  pos_ref2.x = msg->x0.x;
+  pos_ref2.y = msg->x0.y;
+  pos_ref2.z = msg->x0.z;
+  vel_ref_2.x = msg->v0.x;
+  vel_ref_2.y = msg->v0.y;
+  vel_ref_2.z = msg->v0.z;
 
-// };
+  //ROS_INFO("fx: [%f]  fy: [%f] fz: [%f] tau_x: [%f] tau_y: [%f] tau_y: [%f]", pos_ref2.x,pos_ref2.y,pos_ref2.z, vel_ref_2.x,vel_ref_2.y,vel_ref_2.z);
+
+}
 /* ************************************************************************** */
 template<typename T>
 void CoordinatorBase<T>::debug(){
@@ -2127,7 +2192,7 @@ void CoordinatorBase<T>::vl_pred()
     int i1;
     d = 0.0;
     for (i1 = 0; i1 < 6; i1++) {
-      d += a[i + (120 * i1)] * x0[i1];
+      d += a[i + (120 * i1)] * x0_vl[i1];
     }
 
     d1 = 0.0;

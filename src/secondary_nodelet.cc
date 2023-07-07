@@ -22,7 +22,7 @@ void SecondaryNodelet::Initialize(ros::NodeHandle* nh) {
   // publishers
   pub_flight_mode_ = nh->advertise<ff_msgs::FlightMode>(TOPIC_MOBILITY_FLIGHT_MODE, 1, true);  // FlightMode
   pub_status_ = nh->advertise<coordinator::StatusSecondary>(TOPIC_ASAP_STATUS_s, 5, true);
-  pub_ctl_=nh->advertise<ff_msgs::FamCommand>(TOPIC_GNC_CTL_CMD_s,5);
+  pub_ctl_=nh->advertise<ff_msgs::FamCommand>(TOPIC_GNC_CTL_CMD_s,1);
   
   // subscribers
   sub_flight_mode_= nh->subscribe<ff_msgs::FlightMode>(TOPIC_MOBILITY_FLIGHT_MODE, 5,
@@ -33,8 +33,10 @@ void SecondaryNodelet::Initialize(ros::NodeHandle* nh) {
     boost::bind(&SecondaryNodelet::test_num_callback, this, _1));
   sub_flight_mode_= nh->subscribe<ff_msgs::FlightMode>(TOPIC_MOBILITY_FLIGHT_MODE, 5,
     boost::bind(&SecondaryNodelet::flight_mode_callback, this, _1));  // flight mode setter
-  sub_ekf_ = nh->subscribe<ff_msgs::EkfState>("/bumble/gnc/ekf", 5,
+  sub_ekf_ = nh->subscribe<ff_msgs::EkfState>("/bumble/gnc/ekf", 1,
     boost::bind(&SecondaryNodelet::ekf_callback, this, _1));
+    sub_VL_status= nh->subscribe<coordinator::Prediction>(VIRTUAL_LEADER_TOPIC, 1,
+      boost::bind(&SecondaryNodelet::VL_callback, this, _1));
   
   // services SERVICE_GNC_CTL_ENABLE
   serv_ctl_enable_ = nh->serviceClient<std_srvs::SetBool>("/bumble/gnc/ctl/enable");
