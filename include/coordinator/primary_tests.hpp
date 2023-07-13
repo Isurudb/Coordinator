@@ -4,11 +4,11 @@
 
 
 
-/************************************************************************/
+/***********************************************************************/
 void PrimaryNodelet::RunTest0(ros::NodeHandle *nh){
     int system_ret;
     std::string undock_command;
-     undock_command = "rosrun executive teleop_tool -move - pose '10.75 -9 4.5' -att '1.5 0 0 1' -ns 'queen'";//"rosrun dock dock_tool -undock";
+     undock_command = "rosrun executive teleop_tool -move -att '1.5 0 0 1' -ns 'wannabee'";//"rosrun dock dock_tool -undock";
     NODELET_INFO_STREAM("[PRIMARY_COORD]: Congratulations, you have passed quick checkout. " 
     "May your days be blessed with only warnings and no errors.");
     
@@ -29,7 +29,7 @@ void PrimaryNodelet::RunTest0(ros::NodeHandle *nh){
     robot = "Primary";
 
     position_ref.x = position_.x + 0.2;
-    position_ref.y = position_.y + 4.0;
+    position_ref.y = position_.y + 0;
     position_ref.z = position_.z; +0;
 
     //debug quaternion ambiguity
@@ -131,18 +131,13 @@ primary_status_.control_mode = "regulate";
          t=0;
          }
        
-            mpc_pred.stamp=ros::Time::now();
+            //mpc_pred.stamp=ros::Time::now();
 
-            pub_ctl_.publish(gnc_setpoint);
+           
        
 
 
         
-        gnc_setpoint.header.frame_id="body";
-        gnc_setpoint.header.stamp=ros::Time::now();
-        gnc_setpoint.wrench=ctl_input;
-        gnc_setpoint.status=3;
-        gnc_setpoint.control_mode=2;
         
         
         
@@ -154,12 +149,18 @@ primary_status_.control_mode = "regulate";
   
        
        
-        VL_status.publish(mpc_pred);
+        //VL_status.publish(mpc_pred);
         
 
         t+=1;
-
+        gnc_setpoint.header.frame_id="body";
+        gnc_setpoint.header.stamp=ros::Time::now();
+        gnc_setpoint.wrench=ctl_input;
+        gnc_setpoint.status=3;
+        gnc_setpoint.control_mode=2;
         
+
+        pub_ctl_.publish(gnc_setpoint);
         loop_rate.sleep();
 
         ros::spinOnce();

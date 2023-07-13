@@ -22,7 +22,7 @@ Every test has a test#() function available in case it is needed by asap.py
 
 // FSW includes
 #include <ff_util/ff_nodelet.h>
-#include <ff_util/ff_names.h>
+#include <ff_common/ff_names.h>
 #include <ff_util/ff_flight.h>
 #include <ff_util/ff_action.h>
 
@@ -72,9 +72,9 @@ Every test has a test#() function available in case it is needed by asap.py
 
 
 
-static std::string TOPIC_ASAP_STATUS = "/queen/asap/status";
-static std::string TOPIC_ASAP_TEST_NUMBER = "/queen/asap/test_number";
-static std::string TOPIC_GNC_CTL_CMD = "/queen/gnc/ctl/command";
+static std::string TOPIC_ASAP_STATUS = "/wannabee/asap/status";
+static std::string TOPIC_ASAP_TEST_NUMBER = "/wannabee/asap/test_number";
+static std::string TOPIC_GNC_CTL_CMD = "/wannabee/gnc/ctl/command";
 static std::string TOPIC_ASAP_STATUS_s = "/bumble/asap/status";
 static std::string TOPIC_ASAP_TEST_NUMBER_s = "/bumble/asap/test_number";
 static std::string TOPIC_GNC_CTL_CMD_s = "/bumble/gnc/ctl/command";
