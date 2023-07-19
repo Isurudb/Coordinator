@@ -146,6 +146,7 @@ class CoordinatorBase
   std::string stored_control_mode_ = "track";  // stored control_mode, set by parameter inputs
   std::string robot ;
   std::string Estimate_status = "Best";
+  bool publishflag = false;
 
   // Ekf state
   Eigen::Matrix<double, 16, 1> x_real_complete_;
@@ -643,30 +644,36 @@ void CoordinatorBase<T>::ekf_callback(const ff_msgs::EkfState::ConstPtr msg) {
             x0_vl[3]=velocity_.x;
             x0_vl[4]=velocity_.y;
             x0_vl[5]=velocity_.z;
-            vl_pred();
+            if(publishflag)
+            {
+                vl_pred();
+                
+                mpc_pred.x0.x = x0_vl[0];         mpc_pred.x0.y = x0_vl[1];       mpc_pred.x0.z = x0_vl[2];
+                mpc_pred.v0.x = x0_vl[3];         mpc_pred.v0.y = x0_vl[4];       mpc_pred.v0.z = x0_vl[5];
+
+
+                mpc_pred.x1.x = x_pred[0];         mpc_pred.x1.y = x_pred[1];       mpc_pred.x1.z = x_pred[2];
+                mpc_pred.v1.x = x_pred[3];         mpc_pred.v1.y = x_pred[4];       mpc_pred.v1.z = x_pred[5];
+
+                mpc_pred.x2.x = x_pred[6];         mpc_pred.x2.y = x_pred[7];       mpc_pred.x2.z = x_pred[8];
+                mpc_pred.v2.x = x_pred[9];         mpc_pred.v2.y = x_pred[10];       mpc_pred.v2.z = x_pred[11];
+
+                mpc_pred.x3.x = x_pred[12];         mpc_pred.x3.y = x_pred[13];       mpc_pred.x3.z = x_pred[14];        
+                mpc_pred.v3.x = x_pred[15];         mpc_pred.v3.y = x_pred[16];       mpc_pred.v3.z = x_pred[17];
+
+                mpc_pred.x4.x = x_pred[18];         mpc_pred.x4.y = x_pred[19];       mpc_pred.x4.z = x_pred[20];
+                mpc_pred.v4.x = x_pred[21];         mpc_pred.v4.y = x_pred[22];       mpc_pred.v4.z = x_pred[23];
+
+                mpc_pred.x5.x = x_pred[24];         mpc_pred.x5.y = x_pred[25];       mpc_pred.x5.z = x_pred[26];
+                mpc_pred.v5.x = x_pred[27];         mpc_pred.v5.y = x_pred[28];       mpc_pred.v5.z = x_pred[29];
+
+                mpc_pred.x6.x = x_pred[30];         mpc_pred.x6.y = x_pred[31];       mpc_pred.x6.z = x_pred[32];
+                mpc_pred.v6.x = x_pred[33];         mpc_pred.v6.y = x_pred[34];       mpc_pred.v6.z = x_pred[35];
+
+            }
             
-            mpc_pred.x0.x = x0_vl[0];         mpc_pred.x0.y = x0_vl[1];       mpc_pred.x0.z = x0_vl[2];
-            mpc_pred.v0.x = x0_vl[3];         mpc_pred.v0.y = x0_vl[4];       mpc_pred.v0.z = x0_vl[5];
-
-
-            mpc_pred.x1.x = x_pred[0];         mpc_pred.x1.y = x_pred[1];       mpc_pred.x1.z = x_pred[2];
-            mpc_pred.v1.x = x_pred[3];         mpc_pred.v1.y = x_pred[4];       mpc_pred.v1.z = x_pred[5];
-
-            mpc_pred.x2.x = x_pred[6];         mpc_pred.x2.y = x_pred[7];       mpc_pred.x2.z = x_pred[8];
-            mpc_pred.v2.x = x_pred[9];         mpc_pred.v2.y = x_pred[10];       mpc_pred.v2.z = x_pred[11];
-
-            mpc_pred.x3.x = x_pred[12];         mpc_pred.x3.y = x_pred[13];       mpc_pred.x3.z = x_pred[14];        
-            mpc_pred.v3.x = x_pred[15];         mpc_pred.v3.y = x_pred[16];       mpc_pred.v3.z = x_pred[17];
-
-            mpc_pred.x4.x = x_pred[18];         mpc_pred.x4.y = x_pred[19];       mpc_pred.x4.z = x_pred[20];
-            mpc_pred.v4.x = x_pred[21];         mpc_pred.v4.y = x_pred[22];       mpc_pred.v4.z = x_pred[23];
-
-            mpc_pred.x5.x = x_pred[24];         mpc_pred.x5.y = x_pred[25];       mpc_pred.x5.z = x_pred[26];
-            mpc_pred.v5.x = x_pred[27];         mpc_pred.v5.y = x_pred[28];       mpc_pred.v5.z = x_pred[29];
-
-            mpc_pred.x6.x = x_pred[30];         mpc_pred.x6.y = x_pred[31];       mpc_pred.x6.z = x_pred[32];
-            mpc_pred.v6.x = x_pred[33];         mpc_pred.v6.y = x_pred[34];       mpc_pred.v6.z = x_pred[35];
             MPC();
+
           }
           
 
