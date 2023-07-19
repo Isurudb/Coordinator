@@ -1,7 +1,7 @@
 //
 // Academic License - for use in teaching, academic research, and meeting
 // course requirements at degree granting institutions only.  Not for
-// government, commercial, or other organizational use.
+// government, commercial, or other organizational use.jhjh
 // File: mldivide.h
 //
 // MATLAB Coder version            : 5.1

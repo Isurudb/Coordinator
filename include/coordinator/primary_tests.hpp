@@ -4,7 +4,7 @@
 
 
 
-/************************************************************************/
+/***********************************************************************/
 void PrimaryNodelet::RunTest0(ros::NodeHandle *nh){
     int system_ret;
     std::string undock_command;
@@ -131,18 +131,13 @@ primary_status_.control_mode = "regulate";
          t=0;
          }
        
-            mpc_pred.stamp=ros::Time::now();
+            //mpc_pred.stamp=ros::Time::now();
 
-            pub_ctl_.publish(gnc_setpoint);
+           
        
 
 
         
-        gnc_setpoint.header.frame_id="body";
-        gnc_setpoint.header.stamp=ros::Time::now();
-        gnc_setpoint.wrench=ctl_input;
-        gnc_setpoint.status=3;
-        gnc_setpoint.control_mode=2;
         
         
         
@@ -154,12 +149,18 @@ primary_status_.control_mode = "regulate";
   
        
        
-        VL_status.publish(mpc_pred);
+        //VL_status.publish(mpc_pred);
         
 
         t+=1;
-
+        gnc_setpoint.header.frame_id="body";
+        gnc_setpoint.header.stamp=ros::Time::now();
+        gnc_setpoint.wrench=ctl_input;
+        gnc_setpoint.status=3;
+        gnc_setpoint.control_mode=2;
         
+
+        pub_ctl_.publish(gnc_setpoint);
         loop_rate.sleep();
 
         ros::spinOnce();

@@ -4,7 +4,7 @@
 
 
 
-/************************************************************************/
+/***********************************************************************/
 void SecondaryNodelet::RunTest0(ros::NodeHandle *nh){
     int system_ret;
     std::string undock_command;

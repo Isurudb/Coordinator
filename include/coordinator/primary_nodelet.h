@@ -2,7 +2,7 @@
 #include "coordinator/coordinator.tpp"
 #include "coordinator/controller1.h"
 /* //mathlab code generation
-#include <stddef.h>
+#include <stddef.h>hvhgv
 #include <stdio.h>                // This ert_main.c example uses printf/fflush
 #include "controller1.h"               // Model's header file
 #include "rtwtypes.h" */

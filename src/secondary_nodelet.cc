@@ -7,7 +7,7 @@ The primary coordinator, which derives from CoorindatorBase and adds methods for
 #include "coordinator/secondary_dmpc_methods.hpp"
 #include "ros/ros.h"
 //#include "std_msgs/Int32.h"
-/* ************************************************************************** */
+/* ************************************************************************* */
 void SecondaryNodelet::Initialize(ros::NodeHandle* nh) {
   /**
   * @brief This is called when the nodelet is loaded into the nodelet manager

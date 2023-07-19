@@ -7,7 +7,7 @@ The primary coordinator, which derives from CoorindatorBase and adds methods for
 #include "coordinator/primary_tests.hpp"
 #include "ros/ros.h"
 //#include "std_msgs/Int32.h"
-/* ************************************************************************** */
+/* ************************************************************************* */
 void PrimaryNodelet::Initialize(ros::NodeHandle* nh) {
   /**
   * @brief This is called when the nodelet is loaded into the nodelet manager
