@@ -510,32 +510,35 @@ void CoordinatorBase<T>::ekf_callback(const ff_msgs::EkfState::ConstPtr msg) {
   float wy = msg->omega.y;
   float wz = msg->omega.z;
 
-  if (qx != 0 || qy != 0 || qz != 0 || qw != 0) {
-    x_real_complete_(0) = msg->pose.position.x;
-    x_real_complete_(1) = msg->pose.position.y;
-    x_real_complete_(2) = msg->pose.position.z;
-    x_real_complete_(3) = msg->pose.orientation.x;
-    x_real_complete_(4) = msg->pose.orientation.y;
-    x_real_complete_(5) = msg->pose.orientation.z;
-    x_real_complete_(6) = msg->pose.orientation.w;
-    x_real_complete_(7) = msg->velocity.x;
-    x_real_complete_(8) = msg->velocity.y;
-    x_real_complete_(9) = msg->velocity.z;
-    x_real_complete_(10) = msg->omega.x;
-    x_real_complete_(11) = msg->omega.y;
-    x_real_complete_(12) = msg->omega.z;
-    x_real_complete_(13) = 0.0;
-    x_real_complete_(14) = 0.0;
-    x_real_complete_(15) = 0.0;
+  if (qx != 0 || qy != 0 || qz != 0 || qw != 0)
+   {
+      x_real_complete_(0) = msg->pose.position.x;
+      x_real_complete_(1) = msg->pose.position.y;
+      x_real_complete_(2) = msg->pose.position.z;
+      x_real_complete_(3) = msg->pose.orientation.x;
+      x_real_complete_(4) = msg->pose.orientation.y;
+      x_real_complete_(5) = msg->pose.orientation.z;
+      x_real_complete_(6) = msg->pose.orientation.w;
+      x_real_complete_(7) = msg->velocity.x;
+      x_real_complete_(8) = msg->velocity.y;
+      x_real_complete_(9) = msg->velocity.z;
+      x_real_complete_(10) = msg->omega.x;
+      x_real_complete_(11) = msg->omega.y;
+      x_real_complete_(12) = msg->omega.z;
+      x_real_complete_(13) = 0.0;
+      x_real_complete_(14) = 0.0;
+      x_real_complete_(15) = 0.0;
     }
     double prod_val;
     prod_val=qx*q0_x + qy*q0_y + qz*q0_z;
     double deno;
     deno=sqrt(prod_val*prod_val);
-    if ((prod_val==0)){
-    deno=1;
+    if ((prod_val==0))
+    {
+      deno=1;
     }
-    if(prod_val/deno <-0.9 ){
+    if(prod_val/deno <-0.9 )
+    {
       qx=-qx;
       qy=-qy;
       qz=-qz;
@@ -587,233 +590,106 @@ void CoordinatorBase<T>::ekf_callback(const ff_msgs::EkfState::ConstPtr msg) {
     position_ref.y = -9.41988714508+0.5;
     position_ref.z = 4.20110343832;  */
 
-  if(initialzation){
-    position_error.x = position_.x - position_ref.x;
-    position_error.y = position_.y - position_ref.y;
-    position_error.z = position_.z - position_ref.z;
+  if(initialzation)
+  {
+        position_error.x = position_.x - position_ref.x;
+        position_error.y = position_.y - position_ref.y;
+        position_error.z = position_.z - position_ref.z;
 
-    /* velocity_.x=vx - velocity.x;
-    velocity_.y=vy - velocity.y;
-    velocity_.z=vz - velocity.z; */
+        /* velocity_.x=vx - velocity.x;
+        velocity_.y=vy - velocity.y;
+        velocity_.z=vz - velocity.z; */
 
-    position_error_2.x = position_.x - pos_ref2.x;
-    position_error_2.y = position_.y - pos_ref2.y;
-    position_error_2.z = position_.z - pos_ref2.z;
+        position_error_2.x = position_.x - pos_ref2.x;
+        position_error_2.y = position_.y - pos_ref2.y;
+        position_error_2.z = position_.z - pos_ref2.z;
 
-    velocity_.x=vx - vel_ref_2.x;
-    velocity_.y=vy - vel_ref_2.y;
-    velocity_.z=vz - vel_ref_2.z;
+        velocity_.x=vx - vel_ref_2.x;
+        velocity_.y=vy - vel_ref_2.y;
+        velocity_.z=vz - vel_ref_2.z;
 
-  
-
-     arg_x_e = position_error.x;
-     arg_y_e = position_error.y;
-     arg_z_e = position_error.z;
-     arg_vx  = vx;
-     arg_vy  = vy;
-     arg_vz  = vz;
-     arg_qx = q_e.getX();
-     arg_qy = q_e.getY();
-     arg_qz = q_e.getZ();
-     arg_qw = q_e.getW();
-     arg_omegax = wx;
-     arg_omegay = wy;
-     arg_omegaz = wz;
-    /* double *fx;
-    double *fy;
-    double *fz;
-    double *taux;
-    double *tauy;
-    double *tauz; */
-    // Initiating PID controller <<<<<<<<<<<<<<<<<<<<<<<ID
-    // if(Estimate_status=="Best"){
-    // step_PID(); //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<ID
-    // }
-    // else if(Estimate_status=="Good"){
-    // step_PID_good();
-    // }
-    // else if(Estimate_status=="Worst"){
-    step_PID_worst();
-    // }
-    //Vitual leader inbound <<<<<<<<<<<<<<<<<<<<<<<<<< ID
-
-  //   //if(count==0)      {
-  //     x0_vl[0]=position_error.x+0.3;
-  //     x0_vl[1]=position_error.y;
-  //     x0_vl[2]=position_error.z;
-  //     x0_vl[3]=vx;
-  //     x0_vl[4]=vy;
-  //     x0_vl[5]=vz;
-  //      // MPC 
-  //     MPC_vl();
-  //     // Predicting thr trajectory
       
-  //     //}
 
-   
-  //  /*  else {
-  //     x0_vl[0]=x_pred[0];
-  //     x0_vl[1]=x_pred[1];
-  //     x0_vl[2]=x_pred[2];
-  //     x0_vl[3]=x_pred[3];
-  //     x0_vl[4]=x_pred[4];
-  //     x0_vl[5]=x_pred[5];
-  //   } */
+        arg_x_e = position_error.x;
+        arg_y_e = position_error.y;
+        arg_z_e = position_error.z;
+        arg_vx  = vx;
+        arg_vy  = vy;
+        arg_vz  = vz;
+        arg_qx = q_e.getX();
+        arg_qy = q_e.getY();
+        arg_qz = q_e.getZ();
+        arg_qw = q_e.getW();
+        arg_omegax = wx;
+        arg_omegay = wy;
+        arg_omegaz = wz;
+        
+        step_PID_worst();
+
+
+        // MPC Controller inbound <<<<<<<<<<<<<<<<<<<<<<<ID
+        
+          if(robot=="Primary")
+         {  
+            x0[0]=position_error.x;
+            x0[1]=position_error.y;
+            x0[2]=position_error.z;
+            x0[3]=vx;
+            x0[4]=vy;
+            x0[5]=vz;
+            x0_vl[0]=position_.x;
+            x0_vl[1]=position_.y  -0.8;
+            x0_vl[2]=position_.z;
+            x0_vl[3]=velocity_.x;
+            x0_vl[4]=velocity_.y;
+            x0_vl[5]=velocity_.z;
+            vl_pred();
+            
+            mpc_pred.x0.x = x0_vl[0];         mpc_pred.x0.y = x0_vl[1];       mpc_pred.x0.z = x0_vl[2];
+            mpc_pred.v0.x = x0_vl[3];         mpc_pred.v0.y = x0_vl[4];       mpc_pred.v0.z = x0_vl[5];
+
+
+            mpc_pred.x1.x = x_pred[0];         mpc_pred.x1.y = x_pred[1];       mpc_pred.x1.z = x_pred[2];
+            mpc_pred.v1.x = x_pred[3];         mpc_pred.v1.y = x_pred[4];       mpc_pred.v1.z = x_pred[5];
+
+            mpc_pred.x2.x = x_pred[6];         mpc_pred.x2.y = x_pred[7];       mpc_pred.x2.z = x_pred[8];
+            mpc_pred.v2.x = x_pred[9];         mpc_pred.v2.y = x_pred[10];       mpc_pred.v2.z = x_pred[11];
+
+            mpc_pred.x3.x = x_pred[12];         mpc_pred.x3.y = x_pred[13];       mpc_pred.x3.z = x_pred[14];        
+            mpc_pred.v3.x = x_pred[15];         mpc_pred.v3.y = x_pred[16];       mpc_pred.v3.z = x_pred[17];
+
+            mpc_pred.x4.x = x_pred[18];         mpc_pred.x4.y = x_pred[19];       mpc_pred.x4.z = x_pred[20];
+            mpc_pred.v4.x = x_pred[21];         mpc_pred.v4.y = x_pred[22];       mpc_pred.v4.z = x_pred[23];
+
+            mpc_pred.x5.x = x_pred[24];         mpc_pred.x5.y = x_pred[25];       mpc_pred.x5.z = x_pred[26];
+            mpc_pred.v5.x = x_pred[27];         mpc_pred.v5.y = x_pred[28];       mpc_pred.v5.z = x_pred[29];
+
+            mpc_pred.x6.x = x_pred[30];         mpc_pred.x6.y = x_pred[31];       mpc_pred.x6.z = x_pred[32];
+            mpc_pred.v6.x = x_pred[33];         mpc_pred.v6.y = x_pred[34];       mpc_pred.v6.z = x_pred[35];
+            MPC();
+          }
+          
+
+         else
+          {
+            x0[0]=position_.x - pos_ref2.x;
+            x0[1]=position_.y - pos_ref2.y;
+            x0[2]=position_.z - pos_ref2.z;
+            x0[3]=vx - vel_ref_2.x;
+            x0[4]=vy - vel_ref_2.y;
+            x0[5]=vz - vel_ref_2.z;
+            MPC();
+          
+          }
+          
+       /*  count+=1;
+        
+        if (count==5)
+        {
+
+          count =0;
+        }  */
     
-   
-  //   // 1 m behind the 
-  //   double tmep_ex = px - x_pred[0]-0.3;
-  //   double tmep_ey = py - x_pred[1];
-  //   double tmep_ez = pz - x_pred[2];
-  //   double tmep_evx = vx -x_pred[3];
-  //   double tmep_evy = vy -x_pred[4];
-  //   double tmep_evz = vz-x_pred[5];
-
-
-    // MPC Controller inbound <<<<<<<<<<<<<<<<<<<<<<<ID
-    
-      if(robot=="Primary")
-    {  x0[0]=position_error.x;
-      x0[1]=position_error.y;
-      x0[2]=position_error.z;
-      x0[3]=vx;
-      x0[4]=vy;
-      x0[5]=vz;
-      x0_vl[0]=position_.x;
-      x0_vl[1]=position_.y  -0.8;
-      x0_vl[2]=position_.z;
-      x0_vl[3]=velocity_.x;
-      x0_vl[4]=velocity_.y;
-      x0_vl[5]=velocity_.z;
-      vl_pred();
-      
-      mpc_pred.x0.x = x0_vl[0];         mpc_pred.x0.y = x0_vl[1];       mpc_pred.x0.z = x0_vl[2];
-      mpc_pred.v0.x = x0_vl[3];         mpc_pred.v0.y = x0_vl[4];       mpc_pred.v0.z = x0_vl[5];
-
-
-      mpc_pred.x1.x = x_pred[0];         mpc_pred.x1.y = x_pred[1];       mpc_pred.x1.z = x_pred[2];
-      mpc_pred.v1.x = x_pred[3];         mpc_pred.v1.y = x_pred[4];       mpc_pred.v1.z = x_pred[5];
-
-      mpc_pred.x2.x = x_pred[6];         mpc_pred.x2.y = x_pred[7];       mpc_pred.x2.z = x_pred[8];
-      mpc_pred.v2.x = x_pred[9];         mpc_pred.v2.y = x_pred[10];       mpc_pred.v2.z = x_pred[11];
-
-      mpc_pred.x3.x = x_pred[12];         mpc_pred.x3.y = x_pred[13];       mpc_pred.x3.z = x_pred[14];        
-      mpc_pred.v3.x = x_pred[15];         mpc_pred.v3.y = x_pred[16];       mpc_pred.v3.z = x_pred[17];
-
-      mpc_pred.x4.x = x_pred[18];         mpc_pred.x4.y = x_pred[19];       mpc_pred.x4.z = x_pred[20];
-      mpc_pred.v4.x = x_pred[21];         mpc_pred.v4.y = x_pred[22];       mpc_pred.v4.z = x_pred[23];
-
-      mpc_pred.x5.x = x_pred[24];         mpc_pred.x5.y = x_pred[25];       mpc_pred.x5.z = x_pred[26];
-      mpc_pred.v5.x = x_pred[27];         mpc_pred.v5.y = x_pred[28];       mpc_pred.v5.z = x_pred[29];
-
-      mpc_pred.x6.x = x_pred[30];         mpc_pred.x6.y = x_pred[31];       mpc_pred.x6.z = x_pred[32];
-      mpc_pred.v6.x = x_pred[33];         mpc_pred.v6.y = x_pred[34];       mpc_pred.v6.z = x_pred[35];
-      MPC();
-      }
-       
-
-    else
-      {
-        x0[0]=position_.x - pos_ref2.x;
-      x0[1]=position_.y - pos_ref2.y;
-      x0[2]=position_.z - pos_ref2.z;
-      x0[3]=vx - vel_ref_2.x;
-      x0[4]=vy - vel_ref_2.y;
-      x0[5]=vz - vel_ref_2.z;
-      MPC();
-      
-      }
-      
-
-      
-      
-
-
-
-      
-
-      /* x0[0]= tmep_ex;//position_error.x;
-      x0[1]= tmep_ey;//position_error.y;
-      x0[2]= tmep_ex;//position_error.z;
-      x0[3]= tmep_ex;//vx;
-      x0[4]= tmep_ex;//vy;
-      x0[5]= tmep_ex;//vz; */
-
-
-    //if(Estimate_status=="Worst"){
-     //MPC_Guidance_v3_sand_worst();
-    
-    
-    //}
-    // // TRMPC Inbound <<<<<<<<<<<<<<<<<<<<<<<<<<<<ID
-    // v_mpc[0]=Fx;
-    // v_mpc[1]=Fy;
-    // v_mpc[2]=Fz;
-    // if(Estimate_status=="Best"){
-    // nominal_dynamics();
-    // }
-    // else if(Estimate_status=="Good"){
-    //  nominal_dynamics_good();
-    // }  
-    // else if(Estimate_status=="Worst"){
-    //  nominal_dynamics_worst();
-    // } 
-    //sqrt(q_e.getX()*q_e.getX()+q_e.getY()*q_e.getY()+q_e.getZ()*q_e.getZ())>0.005
-    // if (count==0){
-    //   z_nominal[0]=x0[0];
-    //   z_nominal[1]=x0[1];
-    //   z_nominal[2]=x0[2];
-    //   z_nominal[3]=x0[3];
-    //   z_nominal[4]=x0[4];
-    //   z_nominal[5]=x0[5];
-
-    //   initial_run=false;
-
-
-    // }
-    // else{
-    //   z_nominal[0]=zp_nextNominal[0];
-    //   z_nominal[1]=zp_nextNominal[1];
-    //   z_nominal[2]=zp_nextNominal[2];
-    //   z_nominal[3]=zp_nextNominal[3];
-    //   z_nominal[4]=zp_nextNominal[4];
-    //   z_nominal[5]=zp_nextNominal[5];
-
-
-    // }
-
-    
-    // kn_tilda[0]=Fx;
-    // kn_tilda[1]=Fy;
-    // kn_tilda[2]=Fz;
-
-      /* double sx=x0[0]-zp_nextNominal[0];
-      double sy=x0[1]-zp_nextNominal[1];
-      double sz=x0[2]-zp_nextNominal[2];
-      double svx=x0[3]-zp_nextNominal[3];
-      double svy=x0[4]-zp_nextNominal[4];
-      double svz=x0[5]-zp_nextNominal[5]; */
-     /* -------------------------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>ID   */
-    //  if(Estimate_status=="Best"){
-    // tubing_mpc();
-    //  }
-    //  else if(Estimate_status=="Good"){
-    // tubing_mpc_good();
-    //  }
-    //   else if(Estimate_status=="Worst"){
-    // tubing_mpc_worst();
-    //  }
-    count+=1;
-    if (count==5){
-
-      count =0;
-    } 
-    //X_QP=X_Qp
-   // rt_OneStep();
-   //ROS_INFO("ex: [%f]  ey: [%f] ez: [%f] ev_x: [%f] ev_y: [%f] ev_z: [%f]", sx,sy,sz,svx,svy,svz);
-    //ROS_INFO("Yayyy..................");
-
-   //ROS_INFO("fx: [%f]  fy: [%f] fz: [%f] tau_x: [%f] tau_y: [%f] tau_y: [%f]", Fx,Fy,Fz, arg_tau_x,arg_tau_y,arg_tau_z);
   }
 }
 
