@@ -65,7 +65,7 @@ target_link_libraries(SecondaryNodelet ${catkin_LIBRARIES} ${EIGEN_LIBRARIES})
 
 
 
-# install(TARGETS PrimaryNodelet SecondaryNodelet DESTINATION lib)
+install(TARGETS PrimaryNodelet SecondaryNodelet DESTINATION lib)
 
 install(FILES nodelet_plugins.xml
         DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}

@@ -36,6 +36,8 @@ void PrimaryNodelet::Initialize(ros::NodeHandle* nh) {
     boost::bind(&PrimaryNodelet::flight_mode_callback, this, _1));  // flight mode setter
   sub_ekf_ = nh->subscribe<ff_msgs::EkfState>("/gnc/ekf",1,
     boost::bind(&PrimaryNodelet::ekf_callback, this, _1));
+  sub_ekf_leader = nh->subscribe<ff_msgs::EkfState>("/bsharp/gnc/ekf",1,
+    boost::bind(&PrimaryNodelet::ekf_leader_callback, this, _1));
   // sub_VL_status= nh->subscribe<coordinator::Prediction>(VIRTUAL_LEADER_TOPIC, 5,
   //   boost::bind(&PrimaryNodelet::VL_callback, this, _1));
 
