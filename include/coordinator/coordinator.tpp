@@ -71,10 +71,10 @@ Every test has a test#() function available in case it is needed by asap.py
 
 
 
-
+static std::string TOPIC_GNC_CTL_CMD_LEADER = "/bsharp/gnc/ctl/command";
 static std::string TOPIC_ASAP_STATUS = "/wannabee/asap/status";
 static std::string TOPIC_ASAP_TEST_NUMBER = "/wannabee/asap/test_number";
-static std::string TOPIC_GNC_CTL_CMD = "/wannabee/gnc/ctl/command";
+static std::string TOPIC_GNC_CTL_CMD = "/gnc/ctl/command";
 static std::string TOPIC_ASAP_STATUS_s = "/bumble/asap/status";
 static std::string TOPIC_ASAP_TEST_NUMBER_s = "/bumble/asap/test_number";
 static std::string TOPIC_GNC_CTL_CMD_s = "/bumble/gnc/ctl/command";
@@ -117,6 +117,7 @@ class CoordinatorBase
 
   ros::Subscriber sub_flight_mode_;
   ros::Subscriber sub_ekf_;
+  ros::Subscriber sub_ekf_leader;
   ros::Subscriber sub_test_number_;
   ros::Subscriber sub_VL_status;
 
@@ -128,6 +129,7 @@ class CoordinatorBase
   ff_msgs::FlightMode flight_mode_;
   ff_msgs::EkfState ekf_state_;
   ff_msgs::FamCommand gnc_setpoint;
+  ff_msgs::EkfState ekf_state_leader;
 
   coordinator::Prediction mpc_pred;
 
@@ -161,6 +163,7 @@ class CoordinatorBase
   void test_num_callback(const coordinator::TestNumber::ConstPtr msg);
   void flight_mode_callback(const ff_msgs::FlightMode::ConstPtr msg);
   void ekf_callback(const ff_msgs::EkfState::ConstPtr msg);
+  void ekf_leader_callback(const ff_msgs::EkfState::ConstPtr msg);
   void VL_callback(const coordinator::Prediction::ConstPtr  msg);
 
   void debug();
@@ -630,10 +633,10 @@ void CoordinatorBase<T>::ekf_callback(const ff_msgs::EkfState::ConstPtr msg) {
     // step_PID(); //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<ID
     // }
     // else if(Estimate_status=="Good"){
-    // step_PID_good();
+    step_PID_good();
     // }
     // else if(Estimate_status=="Worst"){
-    step_PID_worst();
+    //step_PID_worst();
     // }
     //Vitual leader inbound <<<<<<<<<<<<<<<<<<<<<<<<<< ID
 
@@ -672,7 +675,7 @@ void CoordinatorBase<T>::ekf_callback(const ff_msgs::EkfState::ConstPtr msg) {
 
     // MPC Controller inbound <<<<<<<<<<<<<<<<<<<<<<<ID
     
-      if(robot=="Primary")
+      if(robot=="secondary")
     {  x0[0]=position_error.x;
       x0[1]=position_error.y;
       x0[2]=position_error.z;
@@ -685,7 +688,7 @@ void CoordinatorBase<T>::ekf_callback(const ff_msgs::EkfState::ConstPtr msg) {
       x0_vl[3]=velocity_.x;
       x0_vl[4]=velocity_.y;
       x0_vl[5]=velocity_.z;
-      vl_pred();
+     /*  vl_pred();
       
       mpc_pred.x0.x = x0_vl[0];         mpc_pred.x0.y = x0_vl[1];       mpc_pred.x0.z = x0_vl[2];
       mpc_pred.v0.x = x0_vl[3];         mpc_pred.v0.y = x0_vl[4];       mpc_pred.v0.z = x0_vl[5];
@@ -707,7 +710,7 @@ void CoordinatorBase<T>::ekf_callback(const ff_msgs::EkfState::ConstPtr msg) {
       mpc_pred.v5.x = x_pred[27];         mpc_pred.v5.y = x_pred[28];       mpc_pred.v5.z = x_pred[29];
 
       mpc_pred.x6.x = x_pred[30];         mpc_pred.x6.y = x_pred[31];       mpc_pred.x6.z = x_pred[32];
-      mpc_pred.v6.x = x_pred[33];         mpc_pred.v6.y = x_pred[34];       mpc_pred.v6.z = x_pred[35];
+      mpc_pred.v6.x = x_pred[33];         mpc_pred.v6.y = x_pred[34];       mpc_pred.v6.z = x_pred[35]; */
       MPC();
       }
        
@@ -816,6 +819,59 @@ void CoordinatorBase<T>::ekf_callback(const ff_msgs::EkfState::ConstPtr msg) {
    //ROS_INFO("fx: [%f]  fy: [%f] fz: [%f] tau_x: [%f] tau_y: [%f] tau_y: [%f]", Fx,Fy,Fz, arg_tau_x,arg_tau_y,arg_tau_z);
   }
 }
+
+/* ************************************************************************** */
+template<typename T>
+void CoordinatorBase<T>::ekf_leader_callback(const ff_msgs::EkfState::ConstPtr msg) {
+  /**
+   * @brief The `gnc/ekf` subscriber callback. Called at 62.5 Hz.
+   * Used to check if regulation is finished.
+   * 
+   */
+  float qx = msg->pose.orientation.x;
+  float qy = msg->pose.orientation.y;
+  float qz = msg->pose.orientation.z;
+  float qw = msg->pose.orientation.w;
+
+  float px = msg->pose.position.x;
+  float py = msg->pose.position.y;
+  float pz = msg->pose.position.z;
+
+  float vx = msg->velocity.x;
+  float vy = msg->velocity.y;
+  float vz = msg->velocity.z;
+
+
+  float wx = msg->omega.x;
+  float wy = msg->omega.y;
+  float wz = msg->omega.z;
+
+  if (qx != 0 || qy != 0 || qz != 0 || qw != 0) {
+    x_real_complete_(0) = msg->pose.position.x;
+    x_real_complete_(1) = msg->pose.position.y;
+    x_real_complete_(2) = msg->pose.position.z;
+    x_real_complete_(3) = msg->pose.orientation.x;
+    x_real_complete_(4) = msg->pose.orientation.y;
+    x_real_complete_(5) = msg->pose.orientation.z;
+    x_real_complete_(6) = msg->pose.orientation.w;
+    x_real_complete_(7) = msg->velocity.x;
+    x_real_complete_(8) = msg->velocity.y;
+    x_real_complete_(9) = msg->velocity.z;
+    x_real_complete_(10) = msg->omega.x;
+    x_real_complete_(11) = msg->omega.y;
+    x_real_complete_(12) = msg->omega.z;
+    x_real_complete_(13) = 0.0;
+    x_real_complete_(14) = 0.0;
+    x_real_complete_(15) = 0.0;
+    }
+  pos_ref2.x = px;
+  pos_ref2.y = py-0.2;
+  pos_ref2.z = pz;
+  vel_ref_2.x = vx;
+  vel_ref_2.y = vy;
+  vel_ref_2.z = vz;
+
+   }
 
 
 template<typename T>
