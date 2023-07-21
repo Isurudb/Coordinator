@@ -41,7 +41,9 @@ void PrimaryNodelet::Initialize(ros::NodeHandle* nh) {
 
 
   // services
-  serv_ctl_enable_ = nh->serviceClient<std_srvs::SetBool>(SERVICE_GNC_CTL_ENABLE);
+  //serv_ctl_enable_ = nh->serviceClient<std_srvs::SetBool>(SERVICE_GNC_CTL_ENABLE); //"/gnc/ctl/eanble" /queen/gnc/ctl/enable
+  serv_ctl_enable_ = nh->serviceClient<std_srvs::SetBool>("/queen/gnc/ctl/enable"); //
+
 
   // tracking points
   try{

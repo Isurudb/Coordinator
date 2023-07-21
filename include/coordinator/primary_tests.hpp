@@ -49,7 +49,9 @@ void PrimaryNodelet::RunTest0(ros::NodeHandle *nh){
 
     ROS_INFO("End of initialization............. <<< Test 0 >>> ..............");
 
-   // disable_default_ctl();
+ /*   disable_default_ctl();
+   ros::Duration(0.4).sleep(); // make sure controller gets the regulate settings before disabling default controller.
+    NODELET_DEBUG_STREAM("[PRIMARY COORD]: Disabling default controller..."); */
     //check_regulate();  // check regulation until satisfied
     //ROS_INFO("Setting up the publisher ");
 
@@ -73,6 +75,8 @@ ROS_INFO("Test 2 -- Worst Estimate -- MPC");
 Estimate_status="Worst";
 RunTest0(nh);
 primary_status_.control_mode = "regulate";
+    //base_status_.default_control = false;
+    
     ros::Duration(0.4).sleep(); // make sure controller gets the regulate settings before disabling default controller.
     NODELET_DEBUG_STREAM("[PRIMARY COORD]: Disabling default controller...");
     disable_default_ctl();

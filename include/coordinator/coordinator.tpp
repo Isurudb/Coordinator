@@ -671,7 +671,7 @@ void CoordinatorBase<T>::ekf_callback(const ff_msgs::EkfState::ConstPtr msg) {
                 mpc_pred.v6.x = x_pred[33];         mpc_pred.v6.y = x_pred[34];       mpc_pred.v6.z = x_pred[35];
 
             }
-            
+
             MPC();
 
           }
@@ -1478,6 +1478,7 @@ void CoordinatorBase<T>::disable_default_ctl_callback(const ros::TimerEvent&) {
 
     std::cout << "[COORDINATOR]: Controller disable service time: " << serv_elapsed.count() << " seconds."<< std::endl;
     std::cout << "[COORDINATOR]: Controller disable service result: " << response << std::endl;
+    //ROS_INFO(" Quaternion sign change detected >>>>>>>>>>>>>>>>>>>>> ");
   }
 }
 
