@@ -692,12 +692,12 @@ void CoordinatorBase<T>::ekf_callback(const ff_msgs::EkfState::ConstPtr msg) {
             x0[3]=vx - vel_ref_2.x;
             x0[4]=vy - vel_ref_2.y;
             x0[5]=vz - vel_ref_2.z; */
-            x0[0]=position_error_2.x;
-            x0[1]=position_error_2.y;
-            x0[2]=position_error_2.z;
-            x0[3]=velocity_.x;
-            x0[4]=velocity_.y;
-            x0[5]=velocity_.z;
+            x0[0]=position_error.x;
+            x0[1]=position_error.y;
+            x0[2]=position_error.z;
+            x0[3]=vx;
+            x0[4]=vy;
+            x0[5]=vz;
 
             MPC();
           
