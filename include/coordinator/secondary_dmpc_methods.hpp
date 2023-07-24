@@ -32,10 +32,10 @@ void SecondaryNodelet::RunTest0(ros::NodeHandle *nh){
     
      robot = "Secondary";
     //RunTest1(nh);
-    position_ref.x = position_.x + 0.3;
-    position_ref.y = position_.y + 0.0;
-    position_ref.z = position_.z; +0.0;
-
+    position_ref.x = 0.0; //position_.x + 0.3;
+    position_ref.y = -0.5;//position_.y + 0.0;
+    position_ref.z = position_.z; 
+    
      initialzation=true;
      ROS_INFO("Position data successfully initialized!");
 
@@ -82,15 +82,12 @@ secondary_status_.control_mode = "regulate";
         float u_z = X_QP[2];//Fz;//arg_fz;//-1.0*velocity_.z -0.1*position_error.z;
 
                
-       /*  ctl_input.force.x = u_x*R_11 + u_y*R_21 + u_z*R_31;//-0.05*velocity_.x +0.005*position_error.x;
+        ctl_input.force.x = u_x*R_11 + u_y*R_21 + u_z*R_31;//-0.05*velocity_.x +0.005*position_error.x;
         ctl_input.force.y = u_x*R_12 + u_y*R_22 + u_z*R_32;//-0.05*velocity_.y -0.005*position_error.y;
         ctl_input.force.z = u_x*R_13 + u_y*R_23 + u_z*R_33;//-0.05*velocity_.z +0.005*position_error.z;
-         */ 
+         
 
-        ctl_input.force.x =0.0;
-        ctl_input.force.y=0.1;
-        ctl_input.force.z=0.0;
-
+       
 
         float ex =position_error_2.x;
         float ey =position_error_2.y;
@@ -130,14 +127,14 @@ secondary_status_.control_mode = "regulate";
         
         
 
-       /*  
+        
         ctl_input.torque.x=arg_tau_x;//-0.02*q_e.getX()-0.2*omega.x;
         ctl_input.torque.y=arg_tau_y;//-0.02*q_e.getY()-0.2*omega.y;
         ctl_input.torque.z=arg_tau_z;//-0.02*q_e.getZ()-0.2*omega.z;
-   */
-        ctl_input.torque.x=0.0;
+  
+        /* ctl_input.torque.x=0.0;
         ctl_input.torque.y=0.0;
-        ctl_input.torque.z=0.0;
+        ctl_input.torque.z=0.0; */
 
         gnc_setpoint.header.frame_id="body";
         gnc_setpoint.header.stamp=ros::Time::now();
