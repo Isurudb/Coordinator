@@ -121,13 +121,13 @@ void SecondaryNodelet::load_params(){
   TOPIC_ASAP_TEST_NUMBER = robot_ns + TOPIC_ASAP_TEST_NUMBER;
   std::cout << TOPIC_ASAP_TEST_NUMBER<< std::endl;
 
-  TOPIC_GNC_CTL_CMD = robot_ns + TOPIC_GNC_CTL_CMD;
+  //TOPIC_GNC_CTL_CMD = robot_ns + TOPIC_GNC_CTL_CMD;
   std::cout << TOPIC_GNC_CTL_CMD<< std::endl;
 
-  SERVICE_GNC_CTL_ENABLE_= robot_ns + SERVICE_GNC_CTL_ENABLE_;
+  //SERVICE_GNC_CTL_ENABLE_= robot_ns + SERVICE_GNC_CTL_ENABLE_;
   std::cout << SERVICE_GNC_CTL_ENABLE_<< std::endl;
 
-  TOPIC_GNC_EKF_ = robot_ns + TOPIC_GNC_EKF_;
+  //TOPIC_GNC_EKF_ = robot_ns + TOPIC_GNC_EKF_;
   std::cout << TOPIC_GNC_EKF_<< std::endl;
 
   VIRTUAL_LEADER_TOPIC = secondary_robot_ns + VIRTUAL_LEADER_TOPIC;

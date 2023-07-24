@@ -8,7 +8,7 @@
 void SecondaryNodelet::RunTest0(ros::NodeHandle *nh){
     int system_ret;
     std::string undock_command;
-     undock_command = "rosrun executive teleop_tool -move - pose '-0.3 -0.3' -att '-1.5 0 0 1' '";//"rosrun dock dock_tool -undock -ns 'queen'";
+     undock_command = "rosrun executive teleop_tool -move - pose '-0.3 -0.3'  '";//"rosrun dock dock_tool -undock -ns 'queen'";
     NODELET_INFO_STREAM("[SECONDARY_COORD]: Congratulations, you have passed quick checkout. " 
     "May your days be blessed with only warnings and no errors.");
     
