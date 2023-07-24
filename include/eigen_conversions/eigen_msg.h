@@ -85,10 +85,10 @@ void transformEigenToMsg(const Eigen::Affine3d &e, geometry_msgs::Transform &m);
 void transformEigenToMsg(const Eigen::Isometry3d &e, geometry_msgs::Transform &m);
 
 /// Converts a Twist message into an Eigen matrix
-void twistMsgToEigen(const geometry_msgs::Twist &m, Eigen::Matrix<double,6,1> &e);
+void twistMsgToEigen(const geometry_msgs::Twist& m, Eigen::Matrix<double, 6, 1>& e);
 
 /// Converts an Eigen matrix into a Twist message
-void twistEigenToMsg(const Eigen::Matrix<double,6,1> &e, geometry_msgs::Twist &m);
+void twistEigenToMsg(const Eigen::Matrix<double, 6, 1>& e, geometry_msgs::Twist& m);
 
 /// Converts a Vector message into an Eigen Vector
 void vectorMsgToEigen(const geometry_msgs::Vector3 &m, Eigen::Vector3d &e);
@@ -97,29 +97,27 @@ void vectorMsgToEigen(const geometry_msgs::Vector3 &m, Eigen::Vector3d &e);
 void vectorEigenToMsg(const Eigen::Vector3d &e, geometry_msgs::Vector3 &m);
 
 /// Converts a Wrench message into an Eigen matrix
-void wrenchMsgToEigen(const geometry_msgs::Wrench &m, Eigen::Matrix<double,6,1> &e);
+void wrenchMsgToEigen(const geometry_msgs::Wrench& m, Eigen::Matrix<double, 6, 1>& e);
 
 /// Converts an Eigen matrix into a Wrench message
-void wrenchEigenToMsg(const Eigen::Matrix<double,6,1> &e, geometry_msgs::Wrench &m);
+void wrenchEigenToMsg(const Eigen::Matrix<double, 6, 1>& e, geometry_msgs::Wrench& m);
 
 /// Converts an Eigen matrix into a Float64MultiArray message
 template <class Derived>
-void matrixEigenToMsg(const Eigen::MatrixBase<Derived> &e, std_msgs::Float64MultiArray &m)
-{
+void matrixEigenToMsg(const Eigen::MatrixBase<Derived>& e, std_msgs::Float64MultiArray& m) {
   if (m.layout.dim.size() != 2)
     m.layout.dim.resize(2);
   m.layout.dim[0].stride = e.rows() * e.cols();
   m.layout.dim[0].size = e.rows();
   m.layout.dim[1].stride = e.cols();
   m.layout.dim[1].size = e.cols();
-  if ((int)m.data.size() != e.size())
-    m.data.resize(e.size());
+  if ((int)m.data.size() != e.size()) m.data.resize(e.size());
   int ii = 0;
   for (int i = 0; i < e.rows(); ++i)
     for (int j = 0; j < e.cols(); ++j)
       m.data[ii++] = e.coeff(i, j);
 }
 
-} // namespace
+}  // namespace tf
 
 #endif
