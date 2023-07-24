@@ -32,9 +32,9 @@ void SecondaryNodelet::RunTest0(ros::NodeHandle *nh){
     
      robot = "Secondary";
     //RunTest1(nh);
-    position_ref.x = position_.x + 0;
-    position_ref.y = position_.y + 3.0;
-    position_ref.z = position_.z; +0;
+    position_ref.x = position_.x + 0.3;
+    position_ref.y = position_.y + 0.0;
+    position_ref.z = position_.z; +0.0;
 
      initialzation=true;
      ROS_INFO("Position data successfully initialized!");
