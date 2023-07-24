@@ -29,7 +29,7 @@ void SecondaryNodelet::Initialize(ros::NodeHandle* nh) {
     boost::bind(&SecondaryNodelet::flight_mode_callback, this, _1));  // flight mode getter
   // sub_ekf_ = nh->subscribe<ff_msgs::EkfState>("gnc/ekf", 5,
   //   boost::bind(&PrimaryNodelet::ekf_callback, this, _1));;
-  sub_test_number_ = nh->subscribe<coordinator::TestNumber>(TOPIC_ASAP_TEST_NUMBER_s, 5,
+  sub_test_number_ = nh->subscribe<coordinator::TestNumber>(TOPIC_ASAP_TEST_NUMBER, 5,
     boost::bind(&SecondaryNodelet::test_num_callback, this, _1));
   sub_flight_mode_= nh->subscribe<ff_msgs::FlightMode>(TOPIC_MOBILITY_FLIGHT_MODE, 5,
     boost::bind(&SecondaryNodelet::flight_mode_callback, this, _1));  // flight mode setter
