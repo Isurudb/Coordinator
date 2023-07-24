@@ -71,7 +71,7 @@ Every test has a test#() function available in case it is needed by asap.py
 
 
 
-static std::string TOPIC_GNC_CTL_CMD_LEADER = "/bsharp/gnc/ctl/command";
+
 static std::string TOPIC_ASAP_STATUS = "/wannabee/asap/status";
 static std::string TOPIC_ASAP_TEST_NUMBER = "/wannabee/asap/test_number";
 static std::string TOPIC_GNC_CTL_CMD = "/gnc/ctl/command";
@@ -128,8 +128,8 @@ class CoordinatorBase
 
   ff_msgs::FlightMode flight_mode_;
   ff_msgs::EkfState ekf_state_;
-  ff_msgs::FamCommand gnc_setpoint;
   ff_msgs::EkfState ekf_state_leader;
+  ff_msgs::FamCommand gnc_setpoint;
 
   coordinator::Prediction mpc_pred;
 
@@ -675,7 +675,7 @@ void CoordinatorBase<T>::ekf_callback(const ff_msgs::EkfState::ConstPtr msg) {
 
     // MPC Controller inbound <<<<<<<<<<<<<<<<<<<<<<<ID
     
-      if(robot=="secondary")
+      if(robot=="Primary")
     {  x0[0]=position_error.x;
       x0[1]=position_error.y;
       x0[2]=position_error.z;
@@ -820,6 +820,7 @@ void CoordinatorBase<T>::ekf_callback(const ff_msgs::EkfState::ConstPtr msg) {
   }
 }
 
+
 /* ************************************************************************** */
 template<typename T>
 void CoordinatorBase<T>::ekf_leader_callback(const ff_msgs::EkfState::ConstPtr msg) {
@@ -864,15 +865,14 @@ void CoordinatorBase<T>::ekf_leader_callback(const ff_msgs::EkfState::ConstPtr m
     x_real_complete_(14) = 0.0;
     x_real_complete_(15) = 0.0;
     }
+
   pos_ref2.x = px;
-  pos_ref2.y = py-0.2;
+  pos_ref2.y = py -0.5;
   pos_ref2.z = pz;
   vel_ref_2.x = vx;
   vel_ref_2.y = vy;
   vel_ref_2.z = vz;
-
-   }
-
+}
 
 template<typename T>
 void CoordinatorBase<T>::VL_callback(const coordinator::Prediction::ConstPtr msg){
