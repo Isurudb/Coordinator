@@ -602,7 +602,7 @@ void CoordinatorBase<T>::ekf_callback(const ff_msgs::EkfState::ConstPtr msg) {
   {
         position_error.x = position_.x - position_ref.x;
         position_error.y = position_.y - position_ref.y;
-        position_error.z = position_.z - position_ref.z;
+        position_error.z = 0; //position_.z - position_ref.z;
 
         /* velocity_.x=vx - velocity.x;
         velocity_.y=vy - velocity.y;
