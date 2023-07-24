@@ -113,7 +113,7 @@ secondary_status_.control_mode = "regulate";
            
         ROS_INFO("\n qx: [%f]  qy: [%f] qz: [%f] qw: [%f]", q_e.getX()*q_e.getX(),q_e.getY()*q_e.getY(),q_e.getZ()*q_e.getZ(),q_e.getW());
         ROS_INFO(" \n ref_x: [%f]  ref_y: [%f] ref_z: [%f]\n pose_x: [%f] pose_y: [%f] Pose_z: [%f] \n ",
-            pos_refx, pos_ref.y, pos_ref.z,position_.x,position_.y,position_.z);
+            pos_ref.x, pos_ref.y, pos_ref.z,position_.x,position_.y,position_.z);
          }
          t=0;
          }
