@@ -23,6 +23,7 @@ class PrimaryNodelet : public CoordinatorBase<coordinator::StatusPrimary>, publi
   primary_status_struct primary_status_;
   std::string CONTROL_MODE_TOPIC = "reswarm/primary/control_mode";
   std::string VIRTUAL_LEADER_TOPIC = "virtual_Leader";
+  std::string VIRTUAL_FOLLOWER_TOPIC = "/gnc/ekf";
 
   ros::NodeHandle *nh_;
 

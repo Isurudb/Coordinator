@@ -42,7 +42,7 @@ void SecondaryNodelet::RunTest0(ros::NodeHandle *nh){
     ROS_INFO("End of initialization............. <<< Test 0 >>> ..............");
 
      //run_test_0=true;
-    NODELET_DEBUG_STREAM("[PRIMARY COORD]: ...test complete!");
+    NODELET_DEBUG_STREAM("[SECONDARY COORD]: ...test complete!");
     ROS_INFO("New Goal positions are x: %f y: %f z: %f",position_ref.x,position_ref.y,position_ref.z); 
     base_status_.test_finished = false;
 };
@@ -108,21 +108,18 @@ secondary_status_.control_mode = "regulate";
           
         }
          else{  
-        ROS_INFO(" Deploying MPC for transverse motion  ex: [%f]  ey: [%f] ez: [%f]\n Fx: [%f] Fy: [%f] Fz: [%f] ",
-            pos_ref2.x, pos_ref2.y, pos_ref2.z,ctl_input.force.x,ctl_input.force.y,ctl_input.force.z);
+        ROS_INFO(" Deploying MPC for transverse motion\nex: [%f]  ey: [%f] ez: [%f]\n Fx: [%f] Fy: [%f] Fz: [%f] ",
+            position_error_2.x, position_error_2.y, position_error_2.z,ctl_input.force.x,ctl_input.force.y,ctl_input.force.z);
            
-        ROS_INFO("qx: [%f]  qy: [%f] qz: [%f] qw: [%f]", q_e.getX()*q_e.getX(),q_e.getY()*q_e.getY(),q_e.getZ()*q_e.getZ(),q_e.getW());
+        ROS_INFO("\n qx: [%f]  qy: [%f] qz: [%f] qw: [%f]", q_e.getX()*q_e.getX(),q_e.getY()*q_e.getY(),q_e.getZ()*q_e.getZ(),q_e.getW());
+        ROS_INFO(" \n ref_x: [%f]  ref_y: [%f] ref_z: [%f]\n pose_x: [%f] pose_y: [%f] Pose_z: [%f] \n ",
+            pos_ref2.x, pos_ref2.y, pos_ref2.z,position_.x,position_.y,position_.z);
          }
          t=0;
          }
 
 
         
-        gnc_setpoint.header.frame_id="body";
-        gnc_setpoint.header.stamp=ros::Time::now();
-        gnc_setpoint.wrench=ctl_input;
-        gnc_setpoint.status=3;
-        gnc_setpoint.control_mode=2;
         
         
         
@@ -132,6 +129,11 @@ secondary_status_.control_mode = "regulate";
         ctl_input.torque.y=arg_tau_y;//-0.02*q_e.getY()-0.2*omega.y;
         ctl_input.torque.z=arg_tau_z;//-0.02*q_e.getZ()-0.2*omega.z;
   
+        gnc_setpoint.header.frame_id="body";
+        gnc_setpoint.header.stamp=ros::Time::now();
+        gnc_setpoint.wrench=ctl_input;
+        gnc_setpoint.status=3;
+        gnc_setpoint.control_mode=2;
         
 
         pub_ctl_.publish(gnc_setpoint);
@@ -149,7 +151,7 @@ secondary_status_.control_mode = "regulate";
 
     };
     //****************************************************************************************************
-    NODELET_DEBUG_STREAM("[PRIMARY COORD]: ...test complete!");
+    NODELET_DEBUG_STREAM("[SECONDARY COORD]: ...test complete!");
     base_status_.test_finished = true;
 }
 
