@@ -8,7 +8,7 @@
 void PrimaryNodelet::RunTest0(ros::NodeHandle *nh){
     int system_ret;
     std::string undock_command;
-     undock_command = "rosrun executive teleop_tool -move - pose '10.75 -9 4.5' -att '1.5 0 0 1' -ns 'queen'";//"rosrun dock dock_tool -undock";
+     undock_command = "rosrun executive teleop_tool -move - pos '10.75 -9 4.5' -att '1.5 0 0 1' -ns 'queen'";//"rosrun dock dock_tool -undock";
     NODELET_INFO_STREAM("[PRIMARY_COORD]: Congratulations, you have passed quick checkout. " 
     "May your days be blessed with only warnings and no errors.");
     
@@ -16,7 +16,7 @@ void PrimaryNodelet::RunTest0(ros::NodeHandle *nh){
     
     ros::Duration(5.0).sleep();
     ROS_INFO("Undocking the Astrobee ");
-    NODELET_INFO_STREAM("Calling " << undock_command);
+    //NODELET_INFO_STREAM("Calling " << undock_command);
     system_ret = system(undock_command.c_str());
 
     if(system_ret != 0){
@@ -28,8 +28,8 @@ void PrimaryNodelet::RunTest0(ros::NodeHandle *nh){
     // position_ref.z =  4.4;
     robot = "Primary";
 
-    position_ref.x = position_.x + 0.2;
-    position_ref.y = position_.y - 0.2;
+    position_ref.x = position_.x + 0.5;
+    position_ref.y = position_.y + 0.0;
     position_ref.z = position_.z; +0;
 
     //debug quaternion ambiguity
@@ -145,11 +145,64 @@ primary_status_.control_mode = "regulate";
         
         
         
+        if ( (arg_tau_x>0.01))
+        {
+            ctl_input.torque.x=0.01;
+        }
+        else if (arg_tau_x<-0.01)
+        {
+            ctl_input.torque.x=-0.01;
+
+        }
+
+        else
+        {
+
+            ctl_input.torque.x=arg_tau_x;
+        }
+       // -------------------------------------
+        
+        if ( (arg_tau_y>0.01))
+        {
+            ctl_input.torque.y=0.01;
+        }
+        else if (arg_tau_y<-0.01)
+        {
+            ctl_input.torque.y=-0.01;
+
+        }
+
+        else
+        {
+
+            ctl_input.torque.y=arg_tau_y;
+        }
+
+        //-----------------------------
+
+        if ( (arg_tau_z>0.01))
+        {
+            ctl_input.torque.z=0.01;
+        }
+        else if (arg_tau_z<-0.01)
+        {
+            ctl_input.torque.z=-0.01;
+
+        }
+
+        else
+        {
+
+            ctl_input.torque.z=arg_tau_z;
+        }
+
+
 
         
-        ctl_input.torque.x=arg_tau_x;//-0.02*q_e.getX()-0.2*omega.x;
-        ctl_input.torque.y=arg_tau_y;//-0.02*q_e.getY()-0.2*omega.y;
-        ctl_input.torque.z=arg_tau_z;//-0.02*q_e.getZ()-0.2*omega.z;
+        
+        //ctl_input.torque.x=arg_tau_x;//-0.02*q_e.getX()-0.2*omega.x;
+        //ctl_input.torque.y=arg_tau_y;//-0.02*q_e.getY()-0.2*omega.y;
+        //ctl_input.torque.z=arg_tau_z;//-0.02*q_e.getZ()-0.2*omega.z;
   
        
        

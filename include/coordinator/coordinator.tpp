@@ -564,7 +564,7 @@ void CoordinatorBase<T>::ekf_callback(const ff_msgs::EkfState::ConstPtr msg) {
     omega.y=wy;
     omega.z=wz;
    // geometry_msgs::Vector3 torque, axes_rot;
-    double r=3.14159265, p=0, y=0;  // Rotate the previous pose by 45* about Z
+    double r=3.14159265, p=0, y=0  ;// for wanna bee upside down
    /*  axes_rot.x = 0;
     axes_rot.y = 0;
     axes_rot.z = 1;
@@ -600,16 +600,18 @@ void CoordinatorBase<T>::ekf_callback(const ff_msgs::EkfState::ConstPtr msg) {
 
   if(initialzation)
   {
+        // For the primary
         position_error.x = position_.x - position_ref.x;
         position_error.y = position_.y - position_ref.y;
-        position_error.z = 0; //position_.z - position_ref.z;
+        position_error.z = 0;
 
         /* velocity_.x=vx - velocity.x;
         velocity_.y=vy - velocity.y;
         velocity_.z=vz - velocity.z; */
 
-        position_error_2.x = position_.x - (pos_ref2.x-0.8);
-        position_error_2.y = position_.y - pos_ref2.y;
+        // for the secondary
+        position_error_2.x = position_.x - pos_ref2.x;
+        position_error_2.y = position_.y - pos_ref2.y +0.5; // position off set
         position_error_2.z = 0;
 
         velocity_.x=vx - vel_ref_2.x;
@@ -645,6 +647,8 @@ void CoordinatorBase<T>::ekf_callback(const ff_msgs::EkfState::ConstPtr msg) {
             x0[3]=vx;
             x0[4]=vy;
             x0[5]=vz;
+
+            // not using
             x0_vl[0]=position_.x;
             x0_vl[1]=position_.y  -0.8;
             x0_vl[2]=position_.z;
@@ -692,12 +696,12 @@ void CoordinatorBase<T>::ekf_callback(const ff_msgs::EkfState::ConstPtr msg) {
             x0[3]=vx - vel_ref_2.x;
             x0[4]=vy - vel_ref_2.y;
             x0[5]=vz - vel_ref_2.z; */
-            x0[0]=position_error.x;
-            x0[1]=position_error.y;
-            x0[2]=position_error.z;
-            x0[3]=vx;
-            x0[4]=vy;
-            x0[5]=vz;
+            x0[0]=position_error_2.x;
+            x0[1]=position_error_2.y;
+            x0[2]=position_error_2.z;
+            x0[3]=velocity_.x;
+            x0[4]=velocity_.y;
+            x0[5]=velocity_.z;
 
             MPC();
           

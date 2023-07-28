@@ -8,7 +8,7 @@
 void SecondaryNodelet::RunTest0(ros::NodeHandle *nh){
     int system_ret;
     std::string undock_command;
-     undock_command = "rosrun executive teleop_tool -move - pose '-0.3 -0.3'  '";//"rosrun dock dock_tool -undock -ns 'queen'";
+     undock_command = "rosrun executive teleop_tool -move - pose '10.75 -9.8 4.5' -att '1.5 0 0 1' -ns 'bumble'";//"rosrun dock dock_tool -undock -ns 'queen'";
     NODELET_INFO_STREAM("[SECONDARY_COORD]: Congratulations, you have passed quick checkout. " 
     "May your days be blessed with only warnings and no errors.");
     
@@ -16,7 +16,7 @@ void SecondaryNodelet::RunTest0(ros::NodeHandle *nh){
     
     ros::Duration(5.0).sleep();
     ROS_INFO("Undocking the Astrobee ");
-    NODELET_INFO_STREAM("Calling " << undock_command);
+    //NODELET_INFO_STREAM("Calling " << undock_command);
     system_ret = system(undock_command.c_str());
  
     if(system_ret != 0){
@@ -32,10 +32,10 @@ void SecondaryNodelet::RunTest0(ros::NodeHandle *nh){
     
      robot = "Secondary";
     //RunTest1(nh);
-    position_ref.x = 0.0; //position_.x + 0.3;
-    position_ref.y = -0.5;//position_.y + 0.0;
-    position_ref.z = position_.z; 
-    
+    position_ref.x = position_.x + 0;
+    position_ref.y = position_.y + 3.0;
+    position_ref.z = position_.z; +0;
+
      initialzation=true;
      ROS_INFO("Position data successfully initialized!");
 
@@ -85,10 +85,7 @@ secondary_status_.control_mode = "regulate";
         ctl_input.force.x = u_x*R_11 + u_y*R_21 + u_z*R_31;//-0.05*velocity_.x +0.005*position_error.x;
         ctl_input.force.y = u_x*R_12 + u_y*R_22 + u_z*R_32;//-0.05*velocity_.y -0.005*position_error.y;
         ctl_input.force.z = u_x*R_13 + u_y*R_23 + u_z*R_33;//-0.05*velocity_.z +0.005*position_error.z;
-         
-
-       
-
+            
         float ex =position_error_2.x;
         float ey =position_error_2.y;
         float ez =position_error_2.z;
@@ -112,11 +109,11 @@ secondary_status_.control_mode = "regulate";
         }
          else{  
         ROS_INFO(" Deploying MPC for transverse motion\nex: [%f]  ey: [%f] ez: [%f]\n Fx: [%f] Fy: [%f] Fz: [%f] ",
-            position_error.x, position_error.y, position_error.z,ctl_input.force.x,ctl_input.force.y,ctl_input.force.z);
+            position_error_2.x, position_error_2.y, position_error_2.z,ctl_input.force.x,ctl_input.force.y,ctl_input.force.z);
            
         ROS_INFO("\n qx: [%f]  qy: [%f] qz: [%f] qw: [%f]", q_e.getX()*q_e.getX(),q_e.getY()*q_e.getY(),q_e.getZ()*q_e.getZ(),q_e.getW());
-      /*   ROS_INFO(" \n ref_x: [%f]  ref_y: [%f] ref_z: [%f]\n pose_x: [%f] pose_y: [%f] Pose_z: [%f] \n ",
-            pos_ref.x, pos_ref.y, pos_ref.z,position_.x,position_.y,position_.z); */
+        ROS_INFO(" \n ref_x: [%f]  ref_y: [%f] ref_z: [%f]\n pose_x: [%f] pose_y: [%f] Pose_z: [%f] \n ",
+            pos_ref2.x, pos_ref2.y, pos_ref2.z,position_.x,position_.y,position_.z);
          }
          t=0;
          }
@@ -124,18 +121,64 @@ secondary_status_.control_mode = "regulate";
 
         
         
+           
+        if ( (arg_tau_x>0.01))
+        {
+            ctl_input.torque.x=0.01;
+        }
+        else if (arg_tau_x<-0.01)
+        {
+            ctl_input.torque.x=-0.01;
+
+        }
+
+        else
+        {
+
+            ctl_input.torque.x=arg_tau_x;
+        }
+       // -------------------------------------
         
+        if ( (arg_tau_y>0.01))
+        {
+            ctl_input.torque.y=0.01;
+        }
+        else if (arg_tau_y<-0.01)
+        {
+            ctl_input.torque.y=-0.01;
+
+        }
+
+        else
+        {
+
+            ctl_input.torque.y=arg_tau_y;
+        }
+
+        //-----------------------------
+
+        if ( (arg_tau_z>0.01))
+        {
+            ctl_input.torque.z=0.01;
+        }
+        else if (arg_tau_z<-0.01)
+        {
+            ctl_input.torque.z=-0.01;
+
+        }
+
+        else
+        {
+
+            ctl_input.torque.z=arg_tau_z;
+        }
         
 
         
-        ctl_input.torque.x=arg_tau_x;//-0.02*q_e.getX()-0.2*omega.x;
-        ctl_input.torque.y=arg_tau_y;//-0.02*q_e.getY()-0.2*omega.y;
-        ctl_input.torque.z=arg_tau_z;//-0.02*q_e.getZ()-0.2*omega.z;
+        //ctl_input.torque.x=arg_tau_x;//-0.02*q_e.getX()-0.2*omega.x;
+        //ctl_input.torque.y=arg_tau_y;//-0.02*q_e.getY()-0.2*omega.y;
+        //ctl_input.torque.z=arg_tau_z;//-0.02*q_e.getZ()-0.2*omega.z;
   
-        /* ctl_input.torque.x=0.0;
-        ctl_input.torque.y=0.0;
-        ctl_input.torque.z=0.0; */
-
         gnc_setpoint.header.frame_id="body";
         gnc_setpoint.header.stamp=ros::Time::now();
         gnc_setpoint.wrench=ctl_input;
