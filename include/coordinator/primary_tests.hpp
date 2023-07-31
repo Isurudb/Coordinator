@@ -29,7 +29,7 @@ void PrimaryNodelet::RunTest0(ros::NodeHandle *nh){
     robot = "Primary";
 
     position_ref.x = position_.x + 0.2;
-    position_ref.y = position_.y + 4.0;
+    position_ref.y = position_.y + 0.2;
     position_ref.z = position_.z; +0;
 
     //debug quaternion ambiguity
