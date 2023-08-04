@@ -31,10 +31,26 @@ void SecondaryNodelet::RunTest0(ros::NodeHandle *nh){
     // pub_ctl_=nh->advertise<ff_msgs::FamCommand>(TOPIC_GNC_CTL_CMD,1);
     
      robot = "Secondary";
-    //RunTest1(nh);
-    position_ref.x = position_.x + 0;
-    position_ref.y = position_.y + 3.0;
-    position_ref.z = position_.z; +0;
+    //RunTest1(nh); 
+    //Debugging
+    //pos_ref2.x = 0.8;
+    //pos_ref2.y = 0;
+    //pos_ref2.z = position_.z ;//0.670;
+
+    position_ref.x = position_.x + x0_(0);
+    position_ref.y = position_.y + x0_(1);
+    position_ref.z = position_.z +x0_(2);
+
+    //double L0 L;
+    L0= sqrt( (pos_ref2.x - position_.x)*(pos_ref2.x - position_.x) + (pos_ref2.y - position_.y)*(pos_ref2.y - position_.y) +  (pos_ref2.z - position_.z)*(pos_ref2.z - position_.z) );
+    L=L0;
+    for (int i = 0; i < 50; i++) 
+    {
+        L0 = sqrt( (pos_ref2.x - position_.x)*(pos_ref2.x - position_.x) + (pos_ref2.y - position_.y)*(pos_ref2.y - position_.y) +  (pos_ref2.z - position_.z)*(pos_ref2.z - position_.z) );
+        L=L+0.01*(L-L0);
+        //ROS_INFO("Esitmated L is L0: %f  L: %f",L0,L); 
+    
+    }
 
      initialzation=true;
      ROS_INFO("Position data successfully initialized!");
@@ -43,7 +59,7 @@ void SecondaryNodelet::RunTest0(ros::NodeHandle *nh){
 
      //run_test_0=true;
     NODELET_DEBUG_STREAM("[SECONDARY COORD]: ...test complete!");
-    ROS_INFO("New Goal positions are x: %f y: %f z: %f",position_ref.x,position_ref.y,position_ref.z); 
+    ROS_INFO("Esitmated L is : %f ",L); 
     base_status_.test_finished = false;
 };
 
