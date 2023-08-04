@@ -28,9 +28,9 @@ void PrimaryNodelet::RunTest0(ros::NodeHandle *nh){
     // position_ref.z =  4.4;
     robot = "Primary";
 
-    position_ref.x = position_.x + 0.5;
-    position_ref.y = position_.y + 0.0;
-    position_ref.z = position_.z; +0;
+    position_ref.x = position_.x + x0_(0);//0.5;
+    position_ref.y = position_.y + x0_(1);//0.0;
+    position_ref.z = position_.z + x0_(2);//0;
 
     //debug quaternion ambiguity
     /*q 0_x = attitude.x;

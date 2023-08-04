@@ -154,4 +154,5 @@ static std::string TOPIC_GNC_CTL_CMD = "/queen/gnc/ctl/command";
   ros::param::getCached("/asap/primary/vel_reg_thresh", vel_reg_thresh_);
   ros::param::getCached("/asap/primary/att_reg_thresh", att_reg_thresh_);
   ros::param::getCached("/asap/primary/omega_reg_thresh", omega_reg_thresh_);
+  ROS_INFO("[PRIMARY_COORD]....Goal position: X: %f Y: %f Z: %f ",x0_(0),x0_(1),x0_(2));
 }
