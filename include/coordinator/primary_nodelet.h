@@ -40,8 +40,8 @@ class PrimaryNodelet : public CoordinatorBase<coordinator::StatusPrimary>, publi
   std::string controller_ = "default";  // controller to send commands to
   std::string flight_mode_check_;
 
-  Eigen::Vector3d x0_;
-  Eigen::Vector4d a0_;
+  //Eigen::Vector3d x0_;
+ // Eigen::Vector4d a0_;
 
   Eigen::Matrix<double, 7, 1> POINT_A_GRANITE;
   Eigen::Matrix<double, 7, 1> POINT_A_ISS;

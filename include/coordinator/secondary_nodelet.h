@@ -1,6 +1,6 @@
 #pragma once
 #include "coordinator/coordinator.tpp"
-
+#include "coordinator/controller1.h"
 // status struct for primary Astrobee
 struct secondary_status_struct {
   std::string control_mode = "inactive";
@@ -16,12 +16,14 @@ class SecondaryNodelet : public CoordinatorBase<coordinator::StatusSecondary>, p
  private:
   secondary_status_struct secondary_status_;
   std::string CONTROL_MODE_TOPIC = "reswarm/secondary/control_mode";
+  std::string VIRTUAL_LEADER_TOPIC = "virtual_Leader";
 
   ros::NodeHandle *nh_;
 
   // Publishers and subscriber declarations go here!
   ros::Subscriber sub_status_;
   ros::Subscriber sub_control_mode_;
+
 
   ros::Rate sleep_rate{10.0};
   float reg_time_;  // how long to regulate
@@ -33,8 +35,8 @@ class SecondaryNodelet : public CoordinatorBase<coordinator::StatusSecondary>, p
   std::string controller_ = "default";  // controller to send commands to
   std::string flight_mode_check_;
 
-  Eigen::Vector3d x0_;
-  Eigen::Vector4d a0_;
+  //Eigen::Vector3d x0_;
+  //Eigen::Vector4d a0_;
 
   Eigen::Matrix<double, 7, 1> POINT_A_GRANITE;
   Eigen::Matrix<double, 7, 1> POINT_A_ISS;

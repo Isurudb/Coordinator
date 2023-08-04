@@ -1,3 +1,5 @@
+time stamp
+
 geometry_msgs/Vector3 x1
 geometry_msgs/Vector3 v1
 geometry_msgs/Vector3 x2

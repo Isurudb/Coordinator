@@ -7,7 +7,7 @@ The primary coordinator, which derives from CoorindatorBase and adds methods for
 #include "coordinator/primary_tests.hpp"
 #include "ros/ros.h"
 //#include "std_msgs/Int32.h"
-/* ************************************************************************** */
+/* ************************************************************************* */
 void PrimaryNodelet::Initialize(ros::NodeHandle* nh) {
   /**
   * @brief This is called when the nodelet is loaded into the nodelet manager
@@ -34,14 +34,18 @@ void PrimaryNodelet::Initialize(ros::NodeHandle* nh) {
     boost::bind(&PrimaryNodelet::test_num_callback, this, _1));
   sub_flight_mode_= nh->subscribe<ff_msgs::FlightMode>(TOPIC_MOBILITY_FLIGHT_MODE, 5,
     boost::bind(&PrimaryNodelet::flight_mode_callback, this, _1));  // flight mode setter
-  sub_ekf_ = nh->subscribe<ff_msgs::EkfState>("gnc/ekf", 5,
+  sub_ekf_ = nh->subscribe<ff_msgs::EkfState>(TOPIC_GNC_EKF_,3,
     boost::bind(&PrimaryNodelet::ekf_callback, this, _1));
+  sub_ekf_VF = nh->subscribe<ff_msgs::EkfState>(VIRTUAL_FOLLOWER_TOPIC,3,
+    boost::bind(&PrimaryNodelet::VF_callback, this, _1));
   // sub_VL_status= nh->subscribe<coordinator::Prediction>(VIRTUAL_LEADER_TOPIC, 5,
   //   boost::bind(&PrimaryNodelet::VL_callback, this, _1));
 
 
   // services
-  serv_ctl_enable_ = nh->serviceClient<std_srvs::SetBool>(SERVICE_GNC_CTL_ENABLE);
+  serv_ctl_enable_ = nh->serviceClient<std_srvs::SetBool>(SERVICE_GNC_CTL_ENABLE_); //"/gnc/ctl/eanble" /queen/gnc/ctl/enable
+  //serv_ctl_enable_ = nh->serviceClient<std_srvs::SetBool>("/queen/gnc/ctl/enable"); //
+
 
   // tracking points
   try{
@@ -100,6 +104,43 @@ void PrimaryNodelet::load_params(){
   ros::param::get("/asap/ground", ground_str);
   ground_ = !std::strcmp(ground_str.c_str(), "true");  // convert to bool, 1 if it's true
   
+  // get the robot name
+
+  std::string robot_ns ;
+  ros::param::get("/asap/primary_robot_name", robot_ns);
+
+  // get the follower robot name
+
+  std::string secondary_robot_ns ;
+  ros::param::get("/asap/secondary_robot_name", secondary_robot_ns);
+
+
+  std::cout << "[PRIMARY_COORD] name spaced topics ................" << std::endl;
+  
+  TOPIC_ASAP_STATUS = robot_ns + TOPIC_ASAP_STATUS ;
+  std::cout << TOPIC_ASAP_STATUS<< std::endl;
+
+  TOPIC_ASAP_TEST_NUMBER = robot_ns + TOPIC_ASAP_TEST_NUMBER;
+  std::cout << TOPIC_ASAP_TEST_NUMBER<< std::endl;
+
+  //TOPIC_GNC_CTL_CMD = robot_ns + TOPIC_GNC_CTL_CMD;
+  std::cout << TOPIC_GNC_CTL_CMD<< std::endl;
+
+  //SERVICE_GNC_CTL_ENABLE_ = robot_ns + SERVICE_GNC_CTL_ENABLE_;
+  std::cout << SERVICE_GNC_CTL_ENABLE_<< std::endl;
+
+  //TOPIC_GNC_EKF_ = robot_ns + TOPIC_GNC_EKF_;
+  std::cout << TOPIC_GNC_EKF_<< std::endl;
+
+  VIRTUAL_FOLLOWER_TOPIC = secondary_robot_ns + VIRTUAL_FOLLOWER_TOPIC;
+  std::cout << VIRTUAL_FOLLOWER_TOPIC<< std::endl;
+
+  std::cout << "[PRIMARY_COORD] ................" << std::endl;
+
+/* static std::string TOPIC_ASAP_STATUS = "/queen/asap/status";
+static std::string TOPIC_ASAP_TEST_NUMBER = "/queen/asap/test_number";
+static std::string TOPIC_GNC_CTL_CMD = "/queen/gnc/ctl/command";
+ */  
   // regulation
   ros::param::getCached("/asap/primary/reg_time", reg_time_);
   ros::param::getCached("/asap/primary/x_start", x0_(0));
@@ -113,4 +154,5 @@ void PrimaryNodelet::load_params(){
   ros::param::getCached("/asap/primary/vel_reg_thresh", vel_reg_thresh_);
   ros::param::getCached("/asap/primary/att_reg_thresh", att_reg_thresh_);
   ros::param::getCached("/asap/primary/omega_reg_thresh", omega_reg_thresh_);
+  ROS_INFO("[PRIMARY_COORD]....Goal position: X: %f Y: %f Z: %f ",x0_(0),x0_(1),x0_(2));
 }
