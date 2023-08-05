@@ -16,7 +16,8 @@ class SecondaryNodelet : public CoordinatorBase<coordinator::StatusSecondary>, p
  private:
   secondary_status_struct secondary_status_;
   std::string CONTROL_MODE_TOPIC = "reswarm/secondary/control_mode";
-  std::string VIRTUAL_LEADER_TOPIC = "virtual_Leader";
+  std::string VIRTUAL_LEADER_TOPIC = "/gnc/ekf";
+  std::string VIRTUAL_FOLLOWER_TOPIC = "/gnc/ekf";
 
   ros::NodeHandle *nh_;
 
@@ -35,8 +36,8 @@ class SecondaryNodelet : public CoordinatorBase<coordinator::StatusSecondary>, p
   std::string controller_ = "default";  // controller to send commands to
   std::string flight_mode_check_;
 
-  Eigen::Vector3d x0_;
-  Eigen::Vector4d a0_;
+  //Eigen::Vector3d x0_;
+  //Eigen::Vector4d a0_;
 
   Eigen::Matrix<double, 7, 1> POINT_A_GRANITE;
   Eigen::Matrix<double, 7, 1> POINT_A_ISS;

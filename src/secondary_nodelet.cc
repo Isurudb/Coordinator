@@ -7,7 +7,7 @@ The primary coordinator, which derives from CoorindatorBase and adds methods for
 #include "coordinator/secondary_dmpc_methods.hpp"
 #include "ros/ros.h"
 //#include "std_msgs/Int32.h"
-/* ************************************************************************** */
+/* ************************************************************************* */
 void SecondaryNodelet::Initialize(ros::NodeHandle* nh) {
   /**
   * @brief This is called when the nodelet is loaded into the nodelet manager
@@ -21,25 +21,28 @@ void SecondaryNodelet::Initialize(ros::NodeHandle* nh) {
 
   // publishers
   pub_flight_mode_ = nh->advertise<ff_msgs::FlightMode>(TOPIC_MOBILITY_FLIGHT_MODE, 1, true);  // FlightMode
-  pub_status_ = nh->advertise<coordinator::StatusSecondary>(TOPIC_ASAP_STATUS_s, 5, true);
-  pub_ctl_=nh->advertise<ff_msgs::FamCommand>(TOPIC_GNC_CTL_CMD_s,1);
+  pub_status_ = nh->advertise<coordinator::StatusSecondary>(TOPIC_ASAP_STATUS, 5, true);
+  pub_ctl_=nh->advertise<ff_msgs::FamCommand>(TOPIC_GNC_CTL_CMD,1);
   
   // subscribers
   sub_flight_mode_= nh->subscribe<ff_msgs::FlightMode>(TOPIC_MOBILITY_FLIGHT_MODE, 5,
     boost::bind(&SecondaryNodelet::flight_mode_callback, this, _1));  // flight mode getter
   // sub_ekf_ = nh->subscribe<ff_msgs::EkfState>("gnc/ekf", 5,
   //   boost::bind(&PrimaryNodelet::ekf_callback, this, _1));;
-  sub_test_number_ = nh->subscribe<coordinator::TestNumber>(TOPIC_ASAP_TEST_NUMBER_s, 5,
+  sub_test_number_ = nh->subscribe<coordinator::TestNumber>(TOPIC_ASAP_TEST_NUMBER, 5,
     boost::bind(&SecondaryNodelet::test_num_callback, this, _1));
   sub_flight_mode_= nh->subscribe<ff_msgs::FlightMode>(TOPIC_MOBILITY_FLIGHT_MODE, 5,
     boost::bind(&SecondaryNodelet::flight_mode_callback, this, _1));  // flight mode setter
-  sub_ekf_ = nh->subscribe<ff_msgs::EkfState>("/bumble/gnc/ekf", 1,
-    boost::bind(&SecondaryNodelet::ekf_callback, this, _1));
-    sub_VL_status= nh->subscribe<coordinator::Prediction>(VIRTUAL_LEADER_TOPIC, 1,
-      boost::bind(&SecondaryNodelet::VL_callback, this, _1));
+   sub_ekf_ = nh->subscribe<ff_msgs::EkfState>(TOPIC_GNC_EKF_, 3,
+    boost::bind(&SecondaryNodelet::ekf_callback, this, _1)); //TOPIC_GNC_EKF_
+  sub_ekf_VL = nh->subscribe<ff_msgs::EkfState>(VIRTUAL_LEADER_TOPIC, 3,
+    boost::bind(&SecondaryNodelet::VL_callback, this, _1));
+ /*  sub_ekf_VL = nh->subscribe<ff_msgs::EkfState>(VIRTUAL_LEADER_TOPIC, 3,
+    boost::bind(&SecondaryNodelet::VL_callback, this, _1));  */
+  
   
   // services SERVICE_GNC_CTL_ENABLE
-  serv_ctl_enable_ = nh->serviceClient<std_srvs::SetBool>("/bumble/gnc/ctl/enable");
+  serv_ctl_enable_ = nh->serviceClient<std_srvs::SetBool>(SERVICE_GNC_CTL_ENABLE_);
 
   // tracking points
   try{
@@ -97,18 +100,53 @@ void SecondaryNodelet::load_params(){
   sim_ = !std::strcmp(sim_str.c_str(), "true"); // convert to bool
   ros::param::get("/asap/ground", ground_str);
   ground_ = !std::strcmp(ground_str.c_str(), "true");  // convert to bool, 1 if it's true
+
+
+    // get the robot name
+
+  std::string secondary_robot_ns  ;
+  ros::param::get("/asap/secondary_robot_name", secondary_robot_ns); //secondary_robot_name  
+
+  // get the follower robot name
+
+  std::string robot_ns ;
+  ros::param::get("/asap/primary_robot_name", robot_ns ); //primary_robot_name ie relatively secondary
+
+
+  std::cout << "[SECONDARY_COORD] name spaced topics ................" << std::endl;
+  
+  TOPIC_ASAP_STATUS = robot_ns + TOPIC_ASAP_STATUS ;
+  std::cout << TOPIC_ASAP_STATUS<< std::endl;
+
+  TOPIC_ASAP_TEST_NUMBER = robot_ns + TOPIC_ASAP_TEST_NUMBER;
+  std::cout << TOPIC_ASAP_TEST_NUMBER<< std::endl;
+
+  TOPIC_GNC_CTL_CMD = robot_ns + TOPIC_GNC_CTL_CMD;
+  std::cout << TOPIC_GNC_CTL_CMD<< std::endl;
+
+  SERVICE_GNC_CTL_ENABLE_= robot_ns + SERVICE_GNC_CTL_ENABLE_;
+  std::cout << SERVICE_GNC_CTL_ENABLE_<< std::endl;
+
+  TOPIC_GNC_EKF_ = robot_ns + TOPIC_GNC_EKF_;
+  std::cout << TOPIC_GNC_EKF_<< std::endl;
+
+  VIRTUAL_LEADER_TOPIC = secondary_robot_ns + VIRTUAL_LEADER_TOPIC;
+  std::cout << VIRTUAL_LEADER_TOPIC<< std::endl;
+
+  std::cout << "[SECONDARY_COORD] ................" << std::endl;
   
   // regulation
-  ros::param::getCached("/asap/primary/reg_time", reg_time_);
-  ros::param::getCached("/asap/primary/x_start", x0_(0));
-  ros::param::getCached("/asap/primary/y_start", x0_(1));
-  ros::param::getCached("/asap/primary/z_start", x0_(2));
-  ros::param::getCached("/asap/primary/qx_start", a0_(0));
-  ros::param::getCached("/asap/primary/qy_start", a0_(1));
-  ros::param::getCached("/asap/primary/qz_start", a0_(2));
-  ros::param::getCached("/asap/primary/qw_start", a0_(3));
+  ros::param::getCached("/asap/secondary/reg_time", reg_time_);
+  ros::param::getCached("/asap/secondary/x_start", x0_(0));
+  ros::param::getCached("/asap/secondary/y_start", x0_(1));
+  ros::param::getCached("/asap/secondary/z_start", x0_(2));
+  ros::param::getCached("/asap/secondary/qx_start", a0_(0));
+  ros::param::getCached("/asap/secondary/qy_start", a0_(1));
+  ros::param::getCached("/asap/secondary/qz_start", a0_(2));
+  ros::param::getCached("/asap/secondary/qw_start", a0_(3));
   ros::param::getCached("/asap/primary/pos_reg_thresh", pos_reg_thresh_);
   ros::param::getCached("/asap/primary/vel_reg_thresh", vel_reg_thresh_);
   ros::param::getCached("/asap/primary/att_reg_thresh", att_reg_thresh_);
   ros::param::getCached("/asap/primary/omega_reg_thresh", omega_reg_thresh_);
+  ROS_INFO("[SECONDARY_COORD]....Goal position: X: %f Y: %f Z: %f ",x0_(0),x0_(1),x0_(2));
 }

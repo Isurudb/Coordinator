@@ -4,11 +4,11 @@
 
 
 
-/************************************************************************/
+/***********************************************************************/
 void PrimaryNodelet::RunTest0(ros::NodeHandle *nh){
     int system_ret;
     std::string undock_command;
-     undock_command = "rosrun executive teleop_tool -move - pose '10.75 -9 4.5' -att '1.5 0 0 1' -ns 'queen'";//"rosrun dock dock_tool -undock";
+     undock_command = "rosrun executive teleop_tool -move - pos '10.75 -9 4.5' -att '1.5 0 0 1' -ns 'queen'";//"rosrun dock dock_tool -undock";
     NODELET_INFO_STREAM("[PRIMARY_COORD]: Congratulations, you have passed quick checkout. " 
     "May your days be blessed with only warnings and no errors.");
     
@@ -16,7 +16,7 @@ void PrimaryNodelet::RunTest0(ros::NodeHandle *nh){
     
     ros::Duration(5.0).sleep();
     ROS_INFO("Undocking the Astrobee ");
-    NODELET_INFO_STREAM("Calling " << undock_command);
+    //NODELET_INFO_STREAM("Calling " << undock_command);
     system_ret = system(undock_command.c_str());
 
     if(system_ret != 0){
@@ -28,9 +28,9 @@ void PrimaryNodelet::RunTest0(ros::NodeHandle *nh){
     // position_ref.z =  4.4;
     robot = "Primary";
 
-    position_ref.x = position_.x + 0.2;
-    position_ref.y = position_.y + 0.2;
-    position_ref.z = position_.z; +0;
+    position_ref.x = position_.x + x0_(0);//0.5;
+    position_ref.y = position_.y + x0_(1);//0.0;
+    position_ref.z = position_.z + x0_(2);//0;
 
     //debug quaternion ambiguity
     /*q 0_x = attitude.x;
@@ -49,7 +49,9 @@ void PrimaryNodelet::RunTest0(ros::NodeHandle *nh){
 
     ROS_INFO("End of initialization............. <<< Test 0 >>> ..............");
 
-   // disable_default_ctl();
+ /*   disable_default_ctl();
+   ros::Duration(0.4).sleep(); // make sure controller gets the regulate settings before disabling default controller.
+    NODELET_DEBUG_STREAM("[PRIMARY COORD]: Disabling default controller..."); */
     //check_regulate();  // check regulation until satisfied
     //ROS_INFO("Setting up the publisher ");
 
@@ -73,6 +75,8 @@ ROS_INFO("Test 2 -- Worst Estimate -- MPC");
 Estimate_status="Worst";
 RunTest0(nh);
 primary_status_.control_mode = "regulate";
+    //base_status_.default_control = false;
+    
     ros::Duration(0.4).sleep(); // make sure controller gets the regulate settings before disabling default controller.
     NODELET_DEBUG_STREAM("[PRIMARY COORD]: Disabling default controller...");
     disable_default_ctl();
@@ -131,35 +135,89 @@ primary_status_.control_mode = "regulate";
          t=0;
          }
        
-            mpc_pred.stamp=ros::Time::now();
+            //mpc_pred.stamp=ros::Time::now();
 
-            pub_ctl_.publish(gnc_setpoint);
+           
        
 
 
         
+        
+        
+        
+        if ( (arg_tau_x>0.01))
+        {
+            ctl_input.torque.x=0.01;
+        }
+        else if (arg_tau_x<-0.01)
+        {
+            ctl_input.torque.x=-0.01;
+
+        }
+
+        else
+        {
+
+            ctl_input.torque.x=arg_tau_x;
+        }
+       // -------------------------------------
+        
+        if ( (arg_tau_y>0.01))
+        {
+            ctl_input.torque.y=0.01;
+        }
+        else if (arg_tau_y<-0.01)
+        {
+            ctl_input.torque.y=-0.01;
+
+        }
+
+        else
+        {
+
+            ctl_input.torque.y=arg_tau_y;
+        }
+
+        //-----------------------------
+
+        if ( (arg_tau_z>0.01))
+        {
+            ctl_input.torque.z=0.01;
+        }
+        else if (arg_tau_z<-0.01)
+        {
+            ctl_input.torque.z=-0.01;
+
+        }
+
+        else
+        {
+
+            ctl_input.torque.z=arg_tau_z;
+        }
+
+
+
+        
+        
+        //ctl_input.torque.x=arg_tau_x;//-0.02*q_e.getX()-0.2*omega.x;
+        //ctl_input.torque.y=arg_tau_y;//-0.02*q_e.getY()-0.2*omega.y;
+        //ctl_input.torque.z=arg_tau_z;//-0.02*q_e.getZ()-0.2*omega.z;
+  
+       
+       
+        //VL_status.publish(mpc_pred);
+        
+
+        t+=1;
         gnc_setpoint.header.frame_id="body";
         gnc_setpoint.header.stamp=ros::Time::now();
         gnc_setpoint.wrench=ctl_input;
         gnc_setpoint.status=3;
         gnc_setpoint.control_mode=2;
         
-        
-        
 
-        
-        ctl_input.torque.x=arg_tau_x;//-0.02*q_e.getX()-0.2*omega.x;
-        ctl_input.torque.y=arg_tau_y;//-0.02*q_e.getY()-0.2*omega.y;
-        ctl_input.torque.z=arg_tau_z;//-0.02*q_e.getZ()-0.2*omega.z;
-  
-       
-       
-        VL_status.publish(mpc_pred);
-        
-
-        t+=1;
-
-        
+        pub_ctl_.publish(gnc_setpoint);
         loop_rate.sleep();
 
         ros::spinOnce();
