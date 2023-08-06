@@ -95,11 +95,15 @@ void SecondaryNodelet::get_status_msg(coordinator::StatusSecondary& msg){
 /* ************************************************************************** */
 void SecondaryNodelet::load_params(){
   // Get sim and ground flags
-  std::string sim_str, ground_str;
+  std::string sim_str, ground_str,coupled_str;
   ros::param::get("/asap/sim", sim_str);
   sim_ = !std::strcmp(sim_str.c_str(), "true"); // convert to bool
   ros::param::get("/asap/ground", ground_str);
   ground_ = !std::strcmp(ground_str.c_str(), "true");  // convert to bool, 1 if it's true
+
+  ros::param::get("/asap/coupled", coupled_str);
+  coupled = !std::strcmp(ground_str.c_str(), "true");  // convert to bool, 1 if it's true
+  std::cout << "[SECONDARY_COORD] Coupled mode is activated ................" << std::endl;
 
 
     // get the robot name
