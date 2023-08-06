@@ -98,11 +98,15 @@ void PrimaryNodelet::get_status_msg(coordinator::StatusPrimary& msg){
 /* ************************************************************************** */
 void PrimaryNodelet::load_params(){
   // Get sim and ground flags
-  std::string sim_str, ground_str;
+  std::string sim_str, ground_str,coupled_str;
   ros::param::get("/asap/sim", sim_str);
   sim_ = !std::strcmp(sim_str.c_str(), "true"); // convert to bool
   ros::param::get("/asap/ground", ground_str);
   ground_ = !std::strcmp(ground_str.c_str(), "true");  // convert to bool, 1 if it's true
+
+  ros::param::get("/asap/coupled", coupled_str);
+  coupled = !std::strcmp(ground_str.c_str(), "true");  // convert to bool, 1 if it's true
+  std::cout << "[PRIMARY_COORD] Coupled mode is activated ................" << std::endl;
   
   // get the robot name
 
@@ -137,6 +141,8 @@ void PrimaryNodelet::load_params(){
 
   std::cout << "[PRIMARY_COORD] ................" << std::endl;
 
+
+
 /* static std::string TOPIC_ASAP_STATUS = "/queen/asap/status";
 static std::string TOPIC_ASAP_TEST_NUMBER = "/queen/asap/test_number";
 static std::string TOPIC_GNC_CTL_CMD = "/queen/gnc/ctl/command";
@@ -154,5 +160,6 @@ static std::string TOPIC_GNC_CTL_CMD = "/queen/gnc/ctl/command";
   ros::param::getCached("/asap/primary/vel_reg_thresh", vel_reg_thresh_);
   ros::param::getCached("/asap/primary/att_reg_thresh", att_reg_thresh_);
   ros::param::getCached("/asap/primary/omega_reg_thresh", omega_reg_thresh_);
+
   ROS_INFO("[PRIMARY_COORD]....Goal position: X: %f Y: %f Z: %f ",x0_(0),x0_(1),x0_(2));
 }

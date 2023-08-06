@@ -8,7 +8,7 @@
 void PrimaryNodelet::RunTest0(ros::NodeHandle *nh){
     int system_ret;
     std::string undock_command;
-     undock_command = "rosrun executive teleop_tool -move - pos '10.75 -9 4.5' -att '1.5 0 0 1' -ns 'queen'";//"rosrun dock dock_tool -undock";
+     undock_command = "rosrun executive teleop_tool -move -pos '10.75 -9 4.5' -att '1.5 0 0 1' -ns 'queen'";//"rosrun dock dock_tool -undock";
     NODELET_INFO_STREAM("[PRIMARY_COORD]: Congratulations, you have passed quick checkout. " 
     "May your days be blessed with only warnings and no errors.");
     
@@ -16,7 +16,7 @@ void PrimaryNodelet::RunTest0(ros::NodeHandle *nh){
     
     ros::Duration(5.0).sleep();
     ROS_INFO("Undocking the Astrobee ");
-    //NODELET_INFO_STREAM("Calling " << undock_command);
+    NODELET_INFO_STREAM("Calling " << undock_command);
     system_ret = system(undock_command.c_str());
 
     if(system_ret != 0){
@@ -28,9 +28,20 @@ void PrimaryNodelet::RunTest0(ros::NodeHandle *nh){
     // position_ref.z =  4.4;
     robot = "Primary";
 
-    position_ref.x = position_.x + x0_(0);//0.5;
-    position_ref.y = position_.y + x0_(1);//0.0;
-    position_ref.z = position_.z + x0_(2);//0;
+    position_ref.x = position_.x + x0_(0);
+    position_ref.y = position_.y + x0_(1);
+    position_ref.z = position_.z + x0_(2);
+
+    //double L0 L;
+    L0= sqrt( (pos_ref2.x - position_.x)*(pos_ref2.x - position_.x) + (pos_ref2.y - position_.y)*(pos_ref2.y - position_.y) +  (pos_ref2.z - position_.z)*(pos_ref2.z - position_.z) );
+    L=L0;
+    for (int i = 0; i < 50; i++) 
+    {
+        L0 = sqrt( (pos_ref2.x - position_.x)*(pos_ref2.x - position_.x) + (pos_ref2.y - position_.y)*(pos_ref2.y - position_.y) +  (pos_ref2.z - position_.z)*(pos_ref2.z - position_.z) );
+        L=L+0.01*(L-L0);
+        //ROS_INFO("Esitmated L is L0: %f  L: %f",L0,L); 
+    
+    }
 
     //debug quaternion ambiguity
     /*q 0_x = attitude.x;
@@ -61,6 +72,7 @@ void PrimaryNodelet::RunTest0(ros::NodeHandle *nh){
    // RunTest2(nh);
 
     NODELET_DEBUG_STREAM("[PRIMARY COORD]: ...test complete!");
+    ROS_INFO("Esitmated L is : %f ",L); 
     base_status_.test_finished = false;
 };
 

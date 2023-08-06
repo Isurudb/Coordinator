@@ -16,7 +16,7 @@ void SecondaryNodelet::RunTest0(ros::NodeHandle *nh){
     
     ros::Duration(5.0).sleep();
     ROS_INFO("Undocking the Astrobee ");
-    //NODELET_INFO_STREAM("Calling " << undock_command);
+    NODELET_INFO_STREAM("Calling " << undock_command);
     system_ret = system(undock_command.c_str());
  
     if(system_ret != 0){
@@ -31,12 +31,17 @@ void SecondaryNodelet::RunTest0(ros::NodeHandle *nh){
     // pub_ctl_=nh->advertise<ff_msgs::FamCommand>(TOPIC_GNC_CTL_CMD,1);
     
      robot = "Secondary";
-    //RunTest1(nh);
+    //RunTest1(nh); 
+    //Debugging
+    //pos_ref2.x = 0.8;
+    //pos_ref2.y = 0;
+    //pos_ref2.z = position_.z ;//0.670;
+
     position_ref.x = position_.x + x0_(0);
     position_ref.y = position_.y + x0_(1);
-    position_ref.z = position_.z; + x0_(2);
+    position_ref.z = position_.z +x0_(2);
 
-      //double L0 L;
+    //double L0 L;
     L0= sqrt( (pos_ref2.x - position_.x)*(pos_ref2.x - position_.x) + (pos_ref2.y - position_.y)*(pos_ref2.y - position_.y) +  (pos_ref2.z - position_.z)*(pos_ref2.z - position_.z) );
     L=L0;
     for (int i = 0; i < 50; i++) 
@@ -54,8 +59,7 @@ void SecondaryNodelet::RunTest0(ros::NodeHandle *nh){
 
      //run_test_0=true;
     NODELET_DEBUG_STREAM("[SECONDARY COORD]: ...test complete!");
-    //ROS_INFO("New Goal positions are x: %f y: %f z: %f",position_ref.x,position_ref.y,position_ref.z); 
-     ROS_INFO("Esitmated L is : %f ",L); 
+    ROS_INFO("Esitmated L is : %f ",L); 
     base_status_.test_finished = false;
 };
 
