@@ -2,7 +2,7 @@
 #include "coordinator/coordinator.tpp"
 #include "coordinator/controller1.h"
 /* //mathlab code generation
-#include <stddef.h>
+#include <stddef.h>hvhgv
 #include <stdio.h>                // This ert_main.c example uses printf/fflush
 #include "controller1.h"               // Model's header file
 #include "rtwtypes.h" */
@@ -23,6 +23,7 @@ class PrimaryNodelet : public CoordinatorBase<coordinator::StatusPrimary>, publi
   primary_status_struct primary_status_;
   std::string CONTROL_MODE_TOPIC = "reswarm/primary/control_mode";
   std::string VIRTUAL_LEADER_TOPIC = "virtual_Leader";
+  std::string VIRTUAL_FOLLOWER_TOPIC = "/gnc/ekf";
 
   ros::NodeHandle *nh_;
 
@@ -41,7 +42,7 @@ class PrimaryNodelet : public CoordinatorBase<coordinator::StatusPrimary>, publi
   std::string flight_mode_check_;
 
   //Eigen::Vector3d x0_;
- // Eigen::Vector4d a0_;
+  //Eigen::Vector4d a0_;
 
   Eigen::Matrix<double, 7, 1> POINT_A_GRANITE;
   Eigen::Matrix<double, 7, 1> POINT_A_ISS;

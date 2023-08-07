@@ -16,7 +16,8 @@ class SecondaryNodelet : public CoordinatorBase<coordinator::StatusSecondary>, p
  private:
   secondary_status_struct secondary_status_;
   std::string CONTROL_MODE_TOPIC = "reswarm/secondary/control_mode";
-  std::string VIRTUAL_LEADER_TOPIC = "virtual_Leader";
+  std::string VIRTUAL_LEADER_TOPIC = "/gnc/ekf";
+  std::string VIRTUAL_FOLLOWER_TOPIC = "/gnc/ekf";
 
   ros::NodeHandle *nh_;
 

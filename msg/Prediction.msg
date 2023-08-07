@@ -1,5 +1,9 @@
 time stamp
-
+bool InPosition
+geometry_msgs/Vector3 y0
+geometry_msgs/Vector3 w0
+geometry_msgs/Vector3 x0
+geometry_msgs/Vector3 v0
 geometry_msgs/Vector3 x1
 geometry_msgs/Vector3 v1
 geometry_msgs/Vector3 x2

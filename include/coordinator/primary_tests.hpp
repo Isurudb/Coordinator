@@ -4,11 +4,11 @@
 
 
 
-/************************************************************************/
+/***********************************************************************/
 void PrimaryNodelet::RunTest0(ros::NodeHandle *nh){
     int system_ret;
     std::string undock_command;
-     undock_command = "rosrun executive teleop_tool -move -pos '-0.3 0.3' ";//"rosrun dock dock_tool -undock";
+     undock_command = "rosrun executive teleop_tool -move -pos '10.75 -9 4.5' -att '1.5 0 0 1' -ns 'queen'";//"rosrun dock dock_tool -undock";
     NODELET_INFO_STREAM("[PRIMARY_COORD]: Congratulations, you have passed quick checkout. " 
     "May your days be blessed with only warnings and no errors.");
     
@@ -17,7 +17,7 @@ void PrimaryNodelet::RunTest0(ros::NodeHandle *nh){
     ros::Duration(5.0).sleep();
     ROS_INFO("Undocking the Astrobee ");
     NODELET_INFO_STREAM("Calling " << undock_command);
-    //system_ret = system(undock_command.c_str());
+    system_ret = system(undock_command.c_str());
 
     if(system_ret != 0){
         NODELET_ERROR_STREAM("[PRIMARY/DMPC] Failed to Launch DMPC nodes.");
@@ -30,7 +30,18 @@ void PrimaryNodelet::RunTest0(ros::NodeHandle *nh){
 
     position_ref.x = position_.x + x0_(0);
     position_ref.y = position_.y + x0_(1);
-    position_ref.z = position_.z; +x0_(2);
+    position_ref.z = position_.z + x0_(2);
+
+    //double L0 L;
+    L0= sqrt( (pos_ref2.x - position_.x)*(pos_ref2.x - position_.x) + (pos_ref2.y - position_.y)*(pos_ref2.y - position_.y) +  (pos_ref2.z - position_.z)*(pos_ref2.z - position_.z) );
+    L=L0;
+    for (int i = 0; i < 50; i++) 
+    {
+        L0 = sqrt( (pos_ref2.x - position_.x)*(pos_ref2.x - position_.x) + (pos_ref2.y - position_.y)*(pos_ref2.y - position_.y) +  (pos_ref2.z - position_.z)*(pos_ref2.z - position_.z) );
+        L=L+0.01*(L-L0);
+        //ROS_INFO("Esitmated L is L0: %f  L: %f",L0,L); 
+    
+    }
 
     //debug quaternion ambiguity
     /*q 0_x = attitude.x;
@@ -49,7 +60,9 @@ void PrimaryNodelet::RunTest0(ros::NodeHandle *nh){
 
     ROS_INFO("End of initialization............. <<< Test 0 >>> ..............");
 
-   // disable_default_ctl();
+ /*   disable_default_ctl();
+   ros::Duration(0.4).sleep(); // make sure controller gets the regulate settings before disabling default controller.
+    NODELET_DEBUG_STREAM("[PRIMARY COORD]: Disabling default controller..."); */
     //check_regulate();  // check regulation until satisfied
     //ROS_INFO("Setting up the publisher ");
 
@@ -59,6 +72,7 @@ void PrimaryNodelet::RunTest0(ros::NodeHandle *nh){
    // RunTest2(nh);
 
     NODELET_DEBUG_STREAM("[PRIMARY COORD]: ...test complete!");
+    ROS_INFO("Esitmated L is : %f ",L); 
     base_status_.test_finished = false;
 };
 
@@ -73,6 +87,8 @@ ROS_INFO("Test 2 -- Worst Estimate -- MPC");
 Estimate_status="Worst";
 RunTest0(nh);
 primary_status_.control_mode = "regulate";
+    //base_status_.default_control = false;
+    
     ros::Duration(0.4).sleep(); // make sure controller gets the regulate settings before disabling default controller.
     NODELET_DEBUG_STREAM("[PRIMARY COORD]: Disabling default controller...");
     disable_default_ctl();
@@ -106,13 +122,41 @@ primary_status_.control_mode = "regulate";
         float ex =position_error.x;
         float ey =position_error.y;
         float ez =position_error.z;
- 
-        //ctl_input.torque.x=arg_tau_x;//-0.02*q_e.getX()-0.2*omega.x;
-        //ctl_input.torque.y=arg_tau_y;//-0.02*q_e.getY()-0.2*omega.y;
-        //ctl_input.torque.z=arg_tau_z;//-0.02*q_e.getZ()-0.2*omega.z;
+        
+       
+         
+         if(t==60){ 
+         if(sqrt(ex*ex+ey*ey+ez*ez)<0.1)
+            {
+            ROS_INFO(" -------------------------------\nGoal Position arrived \n-------------------------- \n ex: [%f]  ey: [%f] ez: [%f]\n Fx: [%f] Fy: [%f] Fz: [%f]\n qx: [%f]  qy: [%f] qz: [%f] qw: [%f]\n ",
+            position_error.x, position_error.y, position_error.z,ctl_input.force.x,ctl_input.force.y,ctl_input.force.z , q_e.getX()*q_e.getX(),q_e.getY()*q_e.getY(),q_e.getZ()*q_e.getZ(),q_e.getW());
+            
+        }
+        
+         else{  
+               ROS_INFO(" MPC inbound \n ex: [%f] ey: [%f] ez: [%f] \n Fx: [%f] Fy: [%f] Fz: [%f] \n qx: [%f]  qy: [%f] qz: [%f] qw: [%f]\n ",
+            position_error.x, position_error.y, position_error.z,ctl_input.force.x,ctl_input.force.y,ctl_input.force.z , q_e.getX()*q_e.getX(),q_e.getY()*q_e.getY(),q_e.getZ()*q_e.getZ(),q_e.getW());
+            
 
+        /* ROS_INFO(" Deploying MPC for transverse motion  ex: [%f]  ey: [%f] ez: [%f]\n Fx: [%f] Fy: [%f] Fz: [%f] ",
+            position_error.x, position_error.y, position_error.z,ctl_input.force.x,ctl_input.force.y,ctl_input.force.z);
+           
+        ROS_INFO("qx: [%f]  qy: [%f] qz: [%f] qw: [%f]", q_e.getX()*q_e.getX(),q_e.getY()*q_e.getY(),q_e.getZ()*q_e.getZ(),q_e.getW());
+          */
+         }
+         t=0;
+         }
+       
+            //mpc_pred.stamp=ros::Time::now();
 
            
+       
+
+
+        
+        
+        
+        
         if ( (arg_tau_x>0.01))
         {
             ctl_input.torque.x=0.01;
@@ -163,55 +207,33 @@ primary_status_.control_mode = "regulate";
 
             ctl_input.torque.z=arg_tau_z;
         }
+
+
+
+        
+        
+        //ctl_input.torque.x=arg_tau_x;//-0.02*q_e.getX()-0.2*omega.x;
+        //ctl_input.torque.y=arg_tau_y;//-0.02*q_e.getY()-0.2*omega.y;
+        //ctl_input.torque.z=arg_tau_z;//-0.02*q_e.getZ()-0.2*omega.z;
+  
+       
+       
+        //VL_status.publish(mpc_pred);
         
 
+        t+=1;
         gnc_setpoint.header.frame_id="body";
         gnc_setpoint.header.stamp=ros::Time::now();
         gnc_setpoint.wrench=ctl_input;
         gnc_setpoint.status=3;
         gnc_setpoint.control_mode=2;
-           
-        //VL_status.publish(mpc_pred);
+        
+
         pub_ctl_.publish(gnc_setpoint);
-
-
         loop_rate.sleep();
 
         ros::spinOnce();
-       
-         
-         if(t==60)
-         { 
-            if(sqrt(ex*ex+ey*ey+ez*ez)<0.1)
-            {
-                    ROS_INFO(" ----------------------\nGoal Position arrived\n--------------------------------\n");
-                    ROS_INFO(" Deploying MPC for transverse motion\n  ex: [%f]  ey: [%f] ez: [%f]\n MPC_Fx: [%f] MPC_Fy: [%f] MPC_Fz: [%f]\n ",
-                    position_error.x, position_error.y, position_error.z,X_QP[0],X_QP[1],X_QP[2]);
-                    ROS_INFO("qx: [%f]  qy: [%f] qz: [%f] qw: [%f]\n", q_e.getX()*q_e.getX(),q_e.getY()*q_e.getY(),q_e.getZ()*q_e.getZ(),q_e.getW());
-                
-            
-            }
-        
-            else
-            {  
-                ROS_INFO(" Deploying MPC for transverse motion\n  ex: [%f]  ey: [%f] ez: [%f]\n MPC_Fx: [%f] MPC_Fy: [%f] MPC_Fz: [%f]\n ",
-                    position_error.x, position_error.y, position_error.z,ctl_input.force.x,ctl_input.force.y,ctl_input.force.z);
-                
-                ROS_INFO("qx: [%f]  qy: [%f] qz: [%f] qw: [%f]\n", q_e.getX()*q_e.getX(),q_e.getY()*q_e.getY(),q_e.getZ()*q_e.getZ(),q_e.getW());
-            }
 
-
-            
-        
-         t=0;
-
-         }
-         
-         
-        //mpc_pred.stamp=ros::Time::now();
-
-
-        t+=1;
 
 
     };
