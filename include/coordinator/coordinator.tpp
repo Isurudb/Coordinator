@@ -576,7 +576,7 @@ void CoordinatorBase<T>::ekf_callback(const ff_msgs::EkfState::ConstPtr msg) {
     omega.y=wy;
     omega.z=wz;
    // geometry_msgs::Vector3 torque, axes_rot;
-    double r=3.14159265, p=0, y=0  ;// for wanna bee upside down
+    double r=3.14159265, p=0, y=3.14159265  ;// for wanna bee upside down
    /*  axes_rot.x = 0;
     axes_rot.y = 0;
     axes_rot.z = 1;
