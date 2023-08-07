@@ -33,8 +33,8 @@ void SecondaryNodelet::Initialize(ros::NodeHandle* nh) {
     boost::bind(&SecondaryNodelet::test_num_callback, this, _1));
   sub_flight_mode_= nh->subscribe<ff_msgs::FlightMode>(TOPIC_MOBILITY_FLIGHT_MODE, 5,
     boost::bind(&SecondaryNodelet::flight_mode_callback, this, _1));  // flight mode setter
-   sub_ekf_ = nh->subscribe<ff_msgs::EkfState>(TOPIC_GNC_EKF_, 3,
-    boost::bind(&SecondaryNodelet::ekf_callback, this, _1)); //TOPIC_GNC_EKF_
+   sub_ekf_ = nh->subscribe<ff_msgs::EkfState>(TOPIC_GNC_EKF_ , 3,
+    boost::bind(&SecondaryNodelet::ekf_callback, this, _1)); //TOPIC_GNC_EKF_ TOPIC_GNC_EKF_ "/bumble/gnc/ekf"
   sub_ekf_VL = nh->subscribe<ff_msgs::EkfState>(VIRTUAL_LEADER_TOPIC, 3,
     boost::bind(&SecondaryNodelet::VL_callback, this, _1));
  /*  sub_ekf_VL = nh->subscribe<ff_msgs::EkfState>(VIRTUAL_LEADER_TOPIC, 3,
@@ -95,22 +95,26 @@ void SecondaryNodelet::get_status_msg(coordinator::StatusSecondary& msg){
 /* ************************************************************************** */
 void SecondaryNodelet::load_params(){
   // Get sim and ground flags
-  std::string sim_str, ground_str;
+  std::string sim_str, ground_str,coupled_str;
   ros::param::get("/asap/sim", sim_str);
   sim_ = !std::strcmp(sim_str.c_str(), "true"); // convert to bool
   ros::param::get("/asap/ground", ground_str);
   ground_ = !std::strcmp(ground_str.c_str(), "true");  // convert to bool, 1 if it's true
 
+  ros::param::get("/asap/coupled", coupled_str);
+  coupled = !std::strcmp(ground_str.c_str(), "true");  // convert to bool, 1 if it's true
+  std::cout << "[SECONDARY_COORD] Coupled mode is activated ................" << std::endl;
+
 
     // get the robot name
 
-  std::string secondary_robot_ns  ;
-  ros::param::get("/asap/secondary_robot_name", secondary_robot_ns); //secondary_robot_name  
+  std::string  secondary_robot_ns;
+  ros::param::get("/asap/secondary_robot_name",secondary_robot_ns); //secondary_robot_name  
 
   // get the follower robot name
 
-  std::string robot_ns ;
-  ros::param::get("/asap/primary_robot_name", robot_ns ); //primary_robot_name ie relatively secondary
+  std::string  robot_ns;
+  ros::param::get("/asap/primary_robot_name",robot_ns); //primary_robot_name ie relatively secondary
 
 
   std::cout << "[SECONDARY_COORD] name spaced topics ................" << std::endl;
@@ -148,5 +152,6 @@ void SecondaryNodelet::load_params(){
   ros::param::getCached("/asap/primary/vel_reg_thresh", vel_reg_thresh_);
   ros::param::getCached("/asap/primary/att_reg_thresh", att_reg_thresh_);
   ros::param::getCached("/asap/primary/omega_reg_thresh", omega_reg_thresh_);
+
   ROS_INFO("[SECONDARY_COORD]....Goal position: X: %f Y: %f Z: %f ",x0_(0),x0_(1),x0_(2));
 }
