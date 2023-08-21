@@ -737,6 +737,31 @@ void CoordinatorBase<T>::ekf_callback(const ff_msgs::EkfState::ConstPtr msg) {
           Tau[0]=arg_tau_x;
           Tau[1]=arg_tau_y;
           Tau[2]=arg_tau_z;
+
+          arg_tau_y=0;
+          arg_tau_z=0;
+
+          double t_lim=0.1*L/2;
+
+          for(int i = 0; i < 3; i++)
+          {
+                if ( (Tau[i]>t_lim))
+              {
+                  Tau[i]=t_lim;
+              }
+              else if (Tau[i]<-t_lim)
+              {
+                  Tau[i]=-t_lim;
+        
+              }
+
+              else
+              {
+
+                  Tau[i]=Tau[i];
+              }
+            // -------------------------------------
+          }
           LSS_primary(u_primary,Tau);
           X_QP[0]=F_r[0];
           X_QP[1]=F_r[1];
@@ -754,6 +779,32 @@ void CoordinatorBase<T>::ekf_callback(const ff_msgs::EkfState::ConstPtr msg) {
           Tau[0]=arg_tau_x;
           Tau[1]=arg_tau_y;
           Tau[2]=arg_tau_z;
+
+          arg_tau_y=0;
+          arg_tau_z=0;
+
+          double t_lim=0.1*L/2;
+
+          for(int i = 0; i < 3; i++)
+          {
+                if ( (Tau[i]>t_lim))
+              {
+                  Tau[i]=t_lim;
+              }
+              else if (Tau[i]<-t_lim)
+              {
+                  Tau[i]=-t_lim;
+        
+              }
+
+              else
+              {
+
+                  Tau[i]=Tau[i];
+              }
+            // -------------------------------------
+          }
+
           LSS_secondary(u_primary,Tau);
           X_QP[0]=F_l[0];
           X_QP[1]=F_l[1];
