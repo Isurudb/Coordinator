@@ -22,7 +22,7 @@ Every test has a test#() function available in case it is needed by asap.py
 
 // FSW includes
 #include <ff_util/ff_nodelet.h>
-#include <ff_util/ff_names.h>
+#include <ff_common/ff_names.h>
 #include <ff_util/ff_flight.h>
 #include <ff_util/ff_action.h>
 
@@ -576,7 +576,7 @@ void CoordinatorBase<T>::ekf_callback(const ff_msgs::EkfState::ConstPtr msg) {
     omega.y=wy;
     omega.z=wz;
    // geometry_msgs::Vector3 torque, axes_rot;
-    double r=0, p=0, y=0  ;// Beharp facing x + wall 3.14159265
+    double r=0, p=0, y=0  ;// bsharp facing x+ wall3.14159265
    /*  axes_rot.x = 0;
     axes_rot.y = 0;
     axes_rot.z = 1;
@@ -737,6 +737,32 @@ void CoordinatorBase<T>::ekf_callback(const ff_msgs::EkfState::ConstPtr msg) {
           Tau[0]=arg_tau_x;
           Tau[1]=arg_tau_y;
           Tau[2]=arg_tau_z;
+
+          arg_tau_y=0;
+          arg_tau_z=0;
+
+          double t_lim=0.1*L/2;
+
+          for(int i = 0; i < 3; i++)
+          {
+                if ( (Tau[i]>t_lim))
+              {
+                  Tau[i]=t_lim;
+              }
+              else if (Tau[i]<-t_lim)
+              {
+                  Tau[i]=-t_lim;
+        
+              }
+
+              else
+              {
+
+                  Tau[i]=Tau[i];
+              }
+            // -------------------------------------
+          }
+
           LSS_primary(u_primary,Tau);
           X_QP[0]=F_r[0];
           X_QP[1]=F_r[1];
@@ -754,6 +780,31 @@ void CoordinatorBase<T>::ekf_callback(const ff_msgs::EkfState::ConstPtr msg) {
           Tau[0]=arg_tau_x;
           Tau[1]=arg_tau_y;
           Tau[2]=arg_tau_z;
+          arg_tau_y=0;
+          arg_tau_z=0;
+
+          double t_lim=0.1*L/2;
+
+          for(int i = 0; i < 3; i++)
+          {
+                if ( (Tau[i]>t_lim))
+              {
+                  Tau[i]=t_lim;
+              }
+              else if (Tau[i]<-t_lim)
+              {
+                  Tau[i]=-t_lim;
+        
+              }
+
+              else
+              {
+
+                  Tau[i]=Tau[i];
+              }
+            // -------------------------------------
+          }
+
           LSS_secondary(u_primary,Tau);
           X_QP[0]=F_l[0];
           X_QP[1]=F_l[1];
