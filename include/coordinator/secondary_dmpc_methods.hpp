@@ -16,8 +16,8 @@ void SecondaryNodelet::RunTest0(ros::NodeHandle *nh){
     
     ros::Duration(5.0).sleep();
     ROS_INFO("Undocking the Astrobee ");
-    NODELET_INFO_STREAM("Calling " << undock_command);
-    system_ret = system(undock_command.c_str());
+    //NODELET_INFO_STREAM("Calling " << undock_command);
+    //system_ret = system(undock_command.c_str());
  
     if(system_ret != 0){
         NODELET_ERROR_STREAM("[SECONDARY/DMPC] Failed to Launch DMPC nodes.");
@@ -50,6 +50,11 @@ void SecondaryNodelet::RunTest0(ros::NodeHandle *nh){
         L=L+0.01*(L-L0);
         //ROS_INFO("Esitmated L is L0: %f  L: %f",L0,L); 
     
+    }
+
+    if((pos_ref2.x - position_.x)<0)
+    {
+        L=-L;
     }
 
      initialzation=true;

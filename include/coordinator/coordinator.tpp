@@ -77,6 +77,7 @@ static std::string TOPIC_ASAP_TEST_NUMBER = "/asap/test_number";
 static std::string TOPIC_GNC_CTL_CMD = "/gnc/ctl/command";
 static std::string TOPIC_GNC_EKF_ = "/gnc/ekf";
 static std::string SERVICE_GNC_CTL_ENABLE_ = "/gnc/ctl/enable" ;
+static std::string TOPIC_MOBILITY_FLIGHT_MODE_="/mob/flight_mode";
 
 static std::string TOPIC_ASAP_STATUS_s = "/bumble/asap/status";
 static std::string TOPIC_ASAP_TEST_NUMBER_s = "/bumble/asap/test_number";
@@ -762,7 +763,6 @@ void CoordinatorBase<T>::ekf_callback(const ff_msgs::EkfState::ConstPtr msg) {
               }
             // -------------------------------------
           }
-
           LSS_primary(u_primary,Tau);
           X_QP[0]=F_r[0];
           X_QP[1]=F_r[1];
@@ -780,6 +780,7 @@ void CoordinatorBase<T>::ekf_callback(const ff_msgs::EkfState::ConstPtr msg) {
           Tau[0]=arg_tau_x;
           Tau[1]=arg_tau_y;
           Tau[2]=arg_tau_z;
+
           arg_tau_y=0;
           arg_tau_z=0;
 

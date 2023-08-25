@@ -20,18 +20,18 @@ void SecondaryNodelet::Initialize(ros::NodeHandle* nh) {
   load_params();
 
   // publishers
-  pub_flight_mode_ = nh->advertise<ff_msgs::FlightMode>(TOPIC_MOBILITY_FLIGHT_MODE, 1, true);  // FlightMode
+  pub_flight_mode_ = nh->advertise<ff_msgs::FlightMode>(TOPIC_MOBILITY_FLIGHT_MODE_, 1, true);  // FlightMode
   pub_status_ = nh->advertise<coordinator::StatusSecondary>(TOPIC_ASAP_STATUS, 5, true);
   pub_ctl_=nh->advertise<ff_msgs::FamCommand>(TOPIC_GNC_CTL_CMD,1);
   
   // subscribers
-  sub_flight_mode_= nh->subscribe<ff_msgs::FlightMode>(TOPIC_MOBILITY_FLIGHT_MODE, 5,
+  sub_flight_mode_= nh->subscribe<ff_msgs::FlightMode>(TOPIC_MOBILITY_FLIGHT_MODE_, 5,
     boost::bind(&SecondaryNodelet::flight_mode_callback, this, _1));  // flight mode getter
   // sub_ekf_ = nh->subscribe<ff_msgs::EkfState>("gnc/ekf", 5,
   //   boost::bind(&PrimaryNodelet::ekf_callback, this, _1));;
   sub_test_number_ = nh->subscribe<coordinator::TestNumber>(TOPIC_ASAP_TEST_NUMBER, 5,
     boost::bind(&SecondaryNodelet::test_num_callback, this, _1));
-  sub_flight_mode_= nh->subscribe<ff_msgs::FlightMode>(TOPIC_MOBILITY_FLIGHT_MODE, 5,
+  sub_flight_mode_= nh->subscribe<ff_msgs::FlightMode>(TOPIC_MOBILITY_FLIGHT_MODE_, 5,
     boost::bind(&SecondaryNodelet::flight_mode_callback, this, _1));  // flight mode setter
    sub_ekf_ = nh->subscribe<ff_msgs::EkfState>(TOPIC_GNC_EKF_ , 3,
     boost::bind(&SecondaryNodelet::ekf_callback, this, _1)); //TOPIC_GNC_EKF_ TOPIC_GNC_EKF_ "/bumble/gnc/ekf"
@@ -136,6 +136,9 @@ void SecondaryNodelet::load_params(){
 
   VIRTUAL_LEADER_TOPIC = secondary_robot_ns + VIRTUAL_LEADER_TOPIC;
   std::cout << VIRTUAL_LEADER_TOPIC<< std::endl;
+
+  TOPIC_MOBILITY_FLIGHT_MODE_ = robot_ns + TOPIC_MOBILITY_FLIGHT_MODE_;
+   std::cout << TOPIC_MOBILITY_FLIGHT_MODE_<< std::endl;
 
   std::cout << "[SECONDARY_COORD] ................" << std::endl;
   
