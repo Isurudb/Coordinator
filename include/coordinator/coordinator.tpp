@@ -77,6 +77,7 @@ static std::string TOPIC_ASAP_TEST_NUMBER = "/asap/test_number";
 static std::string TOPIC_GNC_CTL_CMD = "/gnc/ctl/command";
 static std::string TOPIC_GNC_EKF_ = "/gnc/ekf";
 static std::string SERVICE_GNC_CTL_ENABLE_ = "/gnc/ctl/enable" ;
+static std::string TOPIC_MOBILITY_FLIGHT_MODE_="/mob/flight_mode";
 
 static std::string TOPIC_ASAP_STATUS_s = "/bumble/asap/status";
 static std::string TOPIC_ASAP_TEST_NUMBER_s = "/bumble/asap/test_number";
