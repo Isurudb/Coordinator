@@ -42,7 +42,10 @@ void PrimaryNodelet::RunTest0(ros::NodeHandle *nh){
         //ROS_INFO("Esitmated L is L0: %f  L: %f",L0,L); 
     
     }
-
+if((pos_ref2.x - position_.x)<0)
+{
+    L=-L;
+}
     //debug quaternion ambiguity
     /*q 0_x = attitude.x;
     q0_y = attitude.y;
