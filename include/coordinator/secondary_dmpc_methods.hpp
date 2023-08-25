@@ -52,6 +52,11 @@ void SecondaryNodelet::RunTest0(ros::NodeHandle *nh){
     
     }
 
+    if((pos_ref2.x - position_.x)<0)
+    {
+        L=-L;
+    }
+
      initialzation=true;
      ROS_INFO("Position data successfully initialized!");
 
