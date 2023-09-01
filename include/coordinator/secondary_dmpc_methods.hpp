@@ -74,7 +74,7 @@ void SecondaryNodelet::RunTest1(ros::NodeHandle *nh){
     /* RATTLE test: hand off control to RATTLE coordinator
     */
     ROS_INFO("Test 2 -- Worst Estimate -- MPC");
-Estimate_status="Worst";
+//Estimate_status="Worst";
 RunTest0(nh);
 secondary_status_.control_mode = "regulate";
     ros::Duration(0.4).sleep(); // make sure controller gets the regulate settings before disabling default controller.
