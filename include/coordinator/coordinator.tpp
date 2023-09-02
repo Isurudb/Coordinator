@@ -718,15 +718,19 @@ void CoordinatorBase<T>::ekf_callback(const ff_msgs::EkfState::ConstPtr msg) {
 
              if(Estimate_status=="Best"){
                   MPC_Guidance_v3_sand(); //>>>>>>>>>>>>>>>>>>>>>ID
+                  //ROS_INFO("Debugg best selected........... \n");
                 }
                 else if(Estimate_status=="Good"){
                   MPC_Guidance_v3_sand_good();
+                  //ROS_INFO("Debugg good selected........... \n");
                 }
                 else if(Estimate_status=="Worst"){
                   MPC_Guidance_v3_sand_worst();
+                  //ROS_INFO("Debugg worst selected........... \n");
                 }
                 else{
                   MPC_rev_1();
+                  //ROS_INFO("MPC_rev_1 selected ..........\n");
                 }
                 // TRMPC Inbound <<<<<<<<<<<<<<<<<<<<<<<<<<<<ID
                 v_mpc[0]=Fx;

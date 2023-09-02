@@ -87,7 +87,7 @@ void PrimaryNodelet::RunTest1(ros::NodeHandle *nh){
     /* RATTLE test: hand off control to RATTLE coordinator
     */
 ROS_INFO("Test for coupled system -- MPC");
-//Estimate_status="Worst";
+Estimate_status="none";
 RunTest0(nh);
 primary_status_.control_mode = "regulate";
     //base_status_.default_control = false;
