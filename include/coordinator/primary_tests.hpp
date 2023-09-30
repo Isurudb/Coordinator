@@ -63,9 +63,7 @@ void PrimaryNodelet::RunTest0(ros::NodeHandle *nh){
 
     ROS_INFO("End of initialization............. <<< Test 0 >>> ..............");
 
- /*   disable_default_ctl();
-   ros::Duration(0.4).sleep(); // make sure controller gets the regulate settings before disabling default controller.
-    NODELET_DEBUG_STREAM("[PRIMARY COORD]: Disabling default controller..."); */
+   // disable_default_ctl();
     //check_regulate();  // check regulation until satisfied
     //ROS_INFO("Setting up the publisher ");
 
@@ -382,6 +380,8 @@ ROS_INFO("Test 2 -- Worst Estimate -- MPC");
 Estimate_status="Worst";
 RunTest0(nh);
 primary_status_.control_mode = "regulate";
+    //base_status_.default_control = false;
+    
     ros::Duration(0.4).sleep(); // make sure controller gets the regulate settings before disabling default controller.
     NODELET_DEBUG_STREAM("[PRIMARY COORD]: Disabling default controller...");
     disable_default_ctl();
@@ -421,13 +421,21 @@ primary_status_.control_mode = "regulate";
          if(t==60){ 
          if(sqrt(ex*ex+ey*ey+ez*ez)<0.1)
             {
-            ROS_INFO(" ---------------------------------------Goal Position arrived--------------------------------");
+            ROS_INFO(" -------------------------------\nGoal Position arrived \n-------------------------- \n ex: [%f]  ey: [%f] ez: [%f]\n Fx: [%f] Fy: [%f] Fz: [%f]\n qx: [%f]  qy: [%f] qz: [%f] qw: [%f]\n ",
+            position_error.x, position_error.y, position_error.z,ctl_input.force.x,ctl_input.force.y,ctl_input.force.z , q_e.getX()*q_e.getX(),q_e.getY()*q_e.getY(),q_e.getZ()*q_e.getZ(),q_e.getW());
+            
         }
+        
          else{  
-        ROS_INFO(" Deploying MPC for transverse motion  ex: [%f]  ey: [%f] ez: [%f]\n Fx: [%f] Fy: [%f] Fz: [%f] ",
+               ROS_INFO(" MPC inbound \n ex: [%f] ey: [%f] ez: [%f] \n Fx: [%f] Fy: [%f] Fz: [%f] \n qx: [%f]  qy: [%f] qz: [%f] qw: [%f]\n ",
+            position_error.x, position_error.y, position_error.z,ctl_input.force.x,ctl_input.force.y,ctl_input.force.z , q_e.getX()*q_e.getX(),q_e.getY()*q_e.getY(),q_e.getZ()*q_e.getZ(),q_e.getW());
+            
+
+        /* ROS_INFO(" Deploying MPC for transverse motion  ex: [%f]  ey: [%f] ez: [%f]\n Fx: [%f] Fy: [%f] Fz: [%f] ",
             position_error.x, position_error.y, position_error.z,ctl_input.force.x,ctl_input.force.y,ctl_input.force.z);
            
         ROS_INFO("qx: [%f]  qy: [%f] qz: [%f] qw: [%f]", q_e.getX()*q_e.getX(),q_e.getY()*q_e.getY(),q_e.getZ()*q_e.getZ(),q_e.getW());
+          */
          }
          t=0;
          }

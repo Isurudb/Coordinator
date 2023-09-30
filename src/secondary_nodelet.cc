@@ -143,14 +143,14 @@ void SecondaryNodelet::load_params(){
   std::cout << "[SECONDARY_COORD] ................" << std::endl;
   
   // regulation
-  ros::param::getCached("/asap/secondary/reg_time", reg_time_);
-  ros::param::getCached("/asap/secondary/x_start", x0_(0));
-  ros::param::getCached("/asap/secondary/y_start", x0_(1));
-  ros::param::getCached("/asap/secondary/z_start", x0_(2));
-  ros::param::getCached("/asap/secondary/qx_start", a0_(0));
-  ros::param::getCached("/asap/secondary/qy_start", a0_(1));
-  ros::param::getCached("/asap/secondary/qz_start", a0_(2));
-  ros::param::getCached("/asap/secondary/qw_start", a0_(3));
+  ros::param::getCached("/asap/primary/reg_time", reg_time_);
+  ros::param::getCached("/asap/primary/x_start", x0_(0));
+  ros::param::getCached("/asap/primary/y_start", x0_(1));
+  ros::param::getCached("/asap/primary/z_start", x0_(2));
+  ros::param::getCached("/asap/primary/qx_start", a0_(0));
+  ros::param::getCached("/asap/primary/qy_start", a0_(1));
+  ros::param::getCached("/asap/primary/qz_start", a0_(2));
+  ros::param::getCached("/asap/primary/qw_start", a0_(3));
   ros::param::getCached("/asap/primary/pos_reg_thresh", pos_reg_thresh_);
   ros::param::getCached("/asap/primary/vel_reg_thresh", vel_reg_thresh_);
   ros::param::getCached("/asap/primary/att_reg_thresh", att_reg_thresh_);
