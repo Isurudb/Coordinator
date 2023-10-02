@@ -3,7 +3,7 @@
 // course requirements at degree granting institutions only.  Not for
 // government, commercial, or other organizational use.
 // File: rt_nonfinite.h
-//
+//jkj
 // MATLAB Coder version            : 5.1
 // C/C++ source code generated on  : 29-Sep-2022 00:21:21
 //

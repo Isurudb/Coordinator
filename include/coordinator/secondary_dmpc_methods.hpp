@@ -16,8 +16,8 @@ void SecondaryNodelet::RunTest0(ros::NodeHandle *nh){
     
     ros::Duration(5.0).sleep();
     ROS_INFO("Undocking the Astrobee ");
-    NODELET_INFO_STREAM("Calling " << undock_command);
-    system_ret = system(undock_command.c_str());
+    //NODELET_INFO_STREAM("Calling " << undock_command);
+    //system_ret = system(undock_command.c_str());
  
     if(system_ret != 0){
         NODELET_ERROR_STREAM("[SECONDARY/DMPC] Failed to Launch DMPC nodes.");
@@ -52,6 +52,11 @@ void SecondaryNodelet::RunTest0(ros::NodeHandle *nh){
     
     }
 
+    if((pos_ref2.x - position_.x)<0)
+    {
+        L=-L;
+    }
+
      initialzation=true;
      ROS_INFO("Position data successfully initialized!");
 
@@ -69,7 +74,7 @@ void SecondaryNodelet::RunTest1(ros::NodeHandle *nh){
     /* RATTLE test: hand off control to RATTLE coordinator
     */
     ROS_INFO("Test 2 -- Worst Estimate -- MPC");
-Estimate_status="Worst";
+//Estimate_status="Worst";
 RunTest0(nh);
 secondary_status_.control_mode = "regulate";
     ros::Duration(0.4).sleep(); // make sure controller gets the regulate settings before disabling default controller.
