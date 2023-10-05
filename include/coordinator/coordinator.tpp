@@ -22,7 +22,7 @@ Every test has a test#() function available in case it is needed by asap.py
 
 // FSW includes
 #include <ff_util/ff_nodelet.h>
-#include <ff_common/ff_names.h>
+#include <ff_util/ff_names.h>
 #include <ff_util/ff_flight.h>
 #include <ff_util/ff_action.h>
 
@@ -252,7 +252,9 @@ float arg_x_e = 0.0;
 
  Eigen::Vector3d x0_;
  Eigen::Vector4d a0_;
-
+double roll=0.0;
+double pitch=0.0;
+double yaw=0.0;
 double x0[6];
 double x0_vl[6];
 double x_pred[120]={0};
@@ -583,7 +585,7 @@ void CoordinatorBase<T>::ekf_callback(const ff_msgs::EkfState::ConstPtr msg) {
     omega.y=wy;
     omega.z=wz;
    // geometry_msgs::Vector3 torque, axes_rot;
-    double r=3.14159265, p=0, y=0  ;// for wanna bee upside down
+    double r=roll, p=pitch, y=yaw  ;// for wanna bee upside down
    /*  axes_rot.x = 0;
     axes_rot.y = 0;
     axes_rot.z = 1;
@@ -629,8 +631,8 @@ void CoordinatorBase<T>::ekf_callback(const ff_msgs::EkfState::ConstPtr msg) {
         velocity_.z=vz - velocity.z; */
 
         // for the secondary
-        position_error_2.x = position_.x - pos_ref2.x + L;// neg x direction
-        position_error_2.y = position_.y - pos_ref2.y ;//0.5; // position off set
+        position_error_2.x = position_.x - pos_ref2.x ;// neg x direction
+        position_error_2.y = position_.y - pos_ref2.y + L;//0.5; // position off set
         position_error_2.z = position_.z - pos_ref2.z;
 
         velocity_.x=vx - vel_ref_2.x;

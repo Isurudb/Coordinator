@@ -52,7 +52,7 @@ void SecondaryNodelet::RunTest0(ros::NodeHandle *nh){
     
     }
 
-    if((pos_ref2.x - position_.x)<0)
+    if((pos_ref2.y - position_.y)<0)
     {
         L=-L;
     }
