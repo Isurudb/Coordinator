@@ -22,7 +22,7 @@ Every test has a test#() function available in case it is needed by asap.py
 
 // FSW includes
 #include <ff_util/ff_nodelet.h>
-#include <ff_common/ff_names.h>
+#include <ff_util/ff_names.h>
 #include <ff_util/ff_flight.h>
 #include <ff_util/ff_action.h>
 
@@ -123,8 +123,6 @@ class CoordinatorBase
   ros::Subscriber sub_ekf_;
   ros::Subscriber sub_ekf_VF;  // virtual follower >> dds topic
   ros::Subscriber sub_ekf_VL;  // virtual leader >> dds topic
-  ros::Subscriber sub_ekf_VF;  // virtual follower >> dds topic
-  ros::Subscriber sub_ekf_VL;  // virtual leader >> dds topic
   ros::Subscriber sub_test_number_;
   ros::Subscriber sub_VL_status;
 
@@ -154,9 +152,7 @@ class CoordinatorBase
   // Stored status parameters
   std::string stored_control_mode_ = "track";  // stored control_mode, set by parameter inputs
   std::string robot ;
-  std::string robot ;
   std::string Estimate_status = "Best";
-  bool publishflag = false;
   bool publishflag = false;
 
   // Ekf state
@@ -173,9 +169,6 @@ class CoordinatorBase
   void test_num_callback(const coordinator::TestNumber::ConstPtr msg);
   void flight_mode_callback(const ff_msgs::FlightMode::ConstPtr msg);
   void ekf_callback(const ff_msgs::EkfState::ConstPtr msg);
-  void VF_callback(const ff_msgs::EkfState::ConstPtr msg);
-  void VL_callback(const ff_msgs::EkfState::ConstPtr msg);
-  //void VL_callback(const coordinator::Prediction::ConstPtr  msg);
   void VF_callback(const ff_msgs::EkfState::ConstPtr msg);
   void VL_callback(const ff_msgs::EkfState::ConstPtr msg);
   //void VL_callback(const coordinator::Prediction::ConstPtr  msg);
@@ -259,10 +252,11 @@ float arg_x_e = 0.0;
 
  Eigen::Vector3d x0_;
  Eigen::Vector4d a0_;
-
+double roll=0.0;
+double pitch=0.0;
+double yaw=0.0;
 double x0[6];
 double x0_vl[6];
-double x_pred[120]={0};
 double x_pred[120]={0};
 double Fx;
 double Fy;
@@ -282,8 +276,6 @@ double inti_e_z=0;
 float q0_x = 0;
 float q0_y = 0;
 float q0_z = 0;
-
-double L=0.5,L0=0.5;
 
 double L=0.5,L0=0.5;
 
@@ -565,24 +557,6 @@ void CoordinatorBase<T>::ekf_callback(const ff_msgs::EkfState::ConstPtr msg) {
       x_real_complete_(13) = 0.0;
       x_real_complete_(14) = 0.0;
       x_real_complete_(15) = 0.0;
-  if (qx != 0 || qy != 0 || qz != 0 || qw != 0)
-   {
-      x_real_complete_(0) = msg->pose.position.x;
-      x_real_complete_(1) = msg->pose.position.y;
-      x_real_complete_(2) = msg->pose.position.z;
-      x_real_complete_(3) = msg->pose.orientation.x;
-      x_real_complete_(4) = msg->pose.orientation.y;
-      x_real_complete_(5) = msg->pose.orientation.z;
-      x_real_complete_(6) = msg->pose.orientation.w;
-      x_real_complete_(7) = msg->velocity.x;
-      x_real_complete_(8) = msg->velocity.y;
-      x_real_complete_(9) = msg->velocity.z;
-      x_real_complete_(10) = msg->omega.x;
-      x_real_complete_(11) = msg->omega.y;
-      x_real_complete_(12) = msg->omega.z;
-      x_real_complete_(13) = 0.0;
-      x_real_complete_(14) = 0.0;
-      x_real_complete_(15) = 0.0;
     }
     double prod_val;
     prod_val=qx*q0_x + qy*q0_y + qz*q0_z;
@@ -591,12 +565,7 @@ void CoordinatorBase<T>::ekf_callback(const ff_msgs::EkfState::ConstPtr msg) {
     if ((prod_val==0))
     {
       deno=1;
-    if ((prod_val==0))
-    {
-      deno=1;
     }
-    if(prod_val/deno <-0.9 )
-    {
     if(prod_val/deno <-0.9 )
     {
       qx=-qx;
@@ -616,7 +585,7 @@ void CoordinatorBase<T>::ekf_callback(const ff_msgs::EkfState::ConstPtr msg) {
     omega.y=wy;
     omega.z=wz;
    // geometry_msgs::Vector3 torque, axes_rot;
-    double r=0, p=0, y=0  ;// bsharp facing x+ wall3.14159265
+    double r=roll, p=pitch, y=yaw  ;// for wanna bee upside down
    /*  axes_rot.x = 0;
     axes_rot.y = 0;
     axes_rot.z = 1;
@@ -625,8 +594,6 @@ void CoordinatorBase<T>::ekf_callback(const ff_msgs::EkfState::ConstPtr msg) {
         //q_ref.setRotation(axes_rot, 45/180*3.14570);
         tf2::convert(attitude,attitude_);
         q_ref_inv=q_ref.inverse();//
-        q_e= q_ref_inv*attitude_;  // Calculate the new orientation
-        q_e.normalize();
         q_e= q_ref_inv*attitude_;  // Calculate the new orientation
         q_e.normalize();
         float R_11 = 2*(attitude.x*attitude.x + attitude.w*attitude.w)-1;
@@ -662,13 +629,10 @@ void CoordinatorBase<T>::ekf_callback(const ff_msgs::EkfState::ConstPtr msg) {
         /* velocity_.x=vx - velocity.x;
         velocity_.y=vy - velocity.y;
         velocity_.z=vz - velocity.z; */
-        /* velocity_.x=vx - velocity.x;
-        velocity_.y=vy - velocity.y;
-        velocity_.z=vz - velocity.z; */
 
         // for the secondary
-        position_error_2.x = position_.x - pos_ref2.x + L;// neg x direction
-        position_error_2.y = position_.y - pos_ref2.y ;//0.5; // position off set
+        position_error_2.x = position_.x - pos_ref2.x ;// neg x direction
+        position_error_2.y = position_.y - pos_ref2.y + L;//0.5; // position off set
         position_error_2.z = position_.z - pos_ref2.z;
 
         velocity_.x=vx - vel_ref_2.x;
@@ -706,16 +670,6 @@ void CoordinatorBase<T>::ekf_callback(const ff_msgs::EkfState::ConstPtr msg) {
         }
 
 
-        // MPC Controller inbound <<<<<<<<<<<<<<<<<<<<<<<ID
-        
-          if(robot=="Primary")
-         {  
-            x0[0]=position_error.x;
-            x0[1]=position_error.y;
-            x0[2]=position_error.z;
-            x0[3]=vx;
-            x0[4]=vy;
-            x0[5]=vz;
         // MPC Controller inbound <<<<<<<<<<<<<<<<<<<<<<<ID
         
           if(robot=="Primary")

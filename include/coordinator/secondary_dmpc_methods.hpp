@@ -5,7 +5,6 @@
 
 
 /***********************************************************************/
-/***********************************************************************/
 void SecondaryNodelet::RunTest0(ros::NodeHandle *nh){
     int system_ret;
     std::string undock_command;
@@ -31,11 +30,38 @@ void SecondaryNodelet::RunTest0(ros::NodeHandle *nh){
 
     // pub_ctl_=nh->advertise<ff_msgs::FamCommand>(TOPIC_GNC_CTL_CMD,1);
     
+     robot = "Secondary";
+    //RunTest1(nh); 
+    //Debugging
+    //pos_ref2.x = 0.8;
+    //pos_ref2.y = 0;
+    //pos_ref2.z = position_.z ;//0.670;
 
-    //RunTest1(nh);
- position_ref.x = position_.x + 0;
-    position_ref.y = position_.y + 3.0;
-    position_ref.z = position_.z; +0;
+    position_ref.x = position_.x + x0_(0);
+    position_ref.y = position_.y + x0_(1);
+    position_ref.z = position_.z +x0_(2);
+
+    //double L0 L;
+    L0= sqrt( (pos_ref2.x - position_.x)*(pos_ref2.x - position_.x) + (pos_ref2.y - position_.y)*(pos_ref2.y - position_.y) +  (pos_ref2.z - position_.z)*(pos_ref2.z - position_.z) );
+    L=L0;
+    for (int i = 0; i < 50; i++) 
+    {
+        L0 = sqrt( (pos_ref2.x - position_.x)*(pos_ref2.x - position_.x) + (pos_ref2.y - position_.y)*(pos_ref2.y - position_.y) +  (pos_ref2.z - position_.z)*(pos_ref2.z - position_.z) );
+        L=L+0.01*(L-L0);
+        //ROS_INFO("Esitmated L is L0: %f  L: %f",L0,L); 
+    
+    }
+
+    if((pos_ref2.y - position_.y)<0)
+    {
+        L=-L;
+    }
+
+     initialzation=true;
+     ROS_INFO("Position data successfully initialized!");
+
+    ROS_INFO("End of initialization............. <<< Test 0 >>> ..............");
+
      //run_test_0=true;
     NODELET_DEBUG_STREAM("[SECONDARY COORD]: ...test complete!");
     ROS_INFO("Esitmated L is : %f ",L); 
@@ -48,7 +74,7 @@ void SecondaryNodelet::RunTest1(ros::NodeHandle *nh){
     /* RATTLE test: hand off control to RATTLE coordinator
     */
     ROS_INFO("Test 2 -- Worst Estimate -- MPC");
-Estimate_status="none";
+//Estimate_status="Worst";
 RunTest0(nh);
 secondary_status_.control_mode = "regulate";
     ros::Duration(0.4).sleep(); // make sure controller gets the regulate settings before disabling default controller.

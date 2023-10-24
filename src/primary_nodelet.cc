@@ -7,7 +7,7 @@ The primary coordinator, which derives from CoorindatorBase and adds methods for
 #include "coordinator/primary_tests.hpp"
 #include "ros/ros.h"
 //#include "std_msgs/Int32.h"
-/* ************************************************************************** */
+/* ************************************************************************* */
 void PrimaryNodelet::Initialize(ros::NodeHandle* nh) {
   /**
   * @brief This is called when the nodelet is loaded into the nodelet manager
@@ -43,7 +43,9 @@ void PrimaryNodelet::Initialize(ros::NodeHandle* nh) {
 
 
   // services
-  serv_ctl_enable_ = nh->serviceClient<std_srvs::SetBool>(SERVICE_GNC_CTL_ENABLE);
+  serv_ctl_enable_ = nh->serviceClient<std_srvs::SetBool>(SERVICE_GNC_CTL_ENABLE_); //"/gnc/ctl/eanble" /queen/gnc/ctl/enable
+  //serv_ctl_enable_ = nh->serviceClient<std_srvs::SetBool>("/queen/gnc/ctl/enable"); //
+
 
   // tracking points
   try{
@@ -162,6 +164,10 @@ static std::string TOPIC_GNC_CTL_CMD = "/queen/gnc/ctl/command";
   ros::param::getCached("/asap/primary/vel_reg_thresh", vel_reg_thresh_);
   ros::param::getCached("/asap/primary/att_reg_thresh", att_reg_thresh_);
   ros::param::getCached("/asap/primary/omega_reg_thresh", omega_reg_thresh_);
+  ros::param::getCached("/asap/primary/roll", roll);
+  ros::param::getCached("/asap/primary/pitch", pitch);
+  ros::param::getCached("/asap/primary/yaw", yaw);
+
 
   ROS_INFO("[PRIMARY_COORD]....Goal position: X: %f Y: %f Z: %f ",x0_(0),x0_(1),x0_(2));
 }
