@@ -56,6 +56,7 @@ class PrimaryNodelet : public CoordinatorBase<coordinator::StatusPrimary>, publi
   float vel_reg_thresh_;
   float att_reg_thresh_;
   float omega_reg_thresh_;
+  //float rpy[3];
 
   void get_status_msg(coordinator::StatusPrimary& msg) override;
 
