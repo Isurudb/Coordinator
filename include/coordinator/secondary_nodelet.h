@@ -63,6 +63,8 @@ class SecondaryNodelet : public CoordinatorBase<coordinator::StatusSecondary>, p
 
   // Test list (overrides coordinator empty tests---add as desired!)
   void RunTest1(ros::NodeHandle *nh) override;  // a very simple test
+   //Isuru Basnayake
+  void PrintStatus();
    
   void check_regulate();
   void publish_dummy_uc_bound();
