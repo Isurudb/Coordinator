@@ -86,6 +86,8 @@ class PrimaryNodelet : public CoordinatorBase<coordinator::StatusPrimary>, publi
   void RunTest6(ros::NodeHandle *nh) override;
   // Isuru Basnayake sep 1 23
   void RunTest7(ros::NodeHandle *nh) override;
+  //Isuru Basnayake
+  void PrintStatus();
 
   void check_regulate();
   void publish_dummy_uc_bound();

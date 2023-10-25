@@ -20,7 +20,7 @@ void SecondaryNodelet::RunTest0(ros::NodeHandle *nh){
     //system_ret = system(undock_command.c_str());
  
     if(system_ret != 0){
-        NODELET_ERROR_STREAM("[SECONDARY/DMPC] Failed to Launch DMPC nodes.");
+        NODELET_ERROR_STREAM("[SECONDARY_COORD] Failed to Launch DMPC nodes.");
     }
     ROS_INFO("Rotate the previous pose by 180* about Z ....");
 
@@ -30,7 +30,7 @@ void SecondaryNodelet::RunTest0(ros::NodeHandle *nh){
 
     // pub_ctl_=nh->advertise<ff_msgs::FamCommand>(TOPIC_GNC_CTL_CMD,1);
     
-     robot = "Secondary";
+    robot = "Secondary";
     //RunTest1(nh); 
     //Debugging
     //pos_ref2.x = 0.8;
@@ -63,10 +63,36 @@ void SecondaryNodelet::RunTest0(ros::NodeHandle *nh){
     ROS_INFO("End of initialization............. <<< Test 0 >>> ..............");
 
      //run_test_0=true;
-    NODELET_DEBUG_STREAM("[SECONDARY COORD]: ...test complete!");
+    NODELET_DEBUG_STREAM("[SECONDARY_COORD]: ...test complete!");
     ROS_INFO("Esitmated L is : %f ",L); 
     base_status_.test_finished = false;
 };
+
+void SecondaryNodelet::PrintStatus(){
+    float ex =position_error.x;
+    float ey =position_error.y;
+    float ez =position_error.z;
+
+     if(sqrt(ex*ex+ey*ey+ez*ez)<0.1)
+        {
+            ROS_INFO(" -------------------------------\nGoal Position arrived \n-------------------------- \n ex: [%f]  ey: [%f] ez: [%f]\n Fx: [%f] Fy: [%f] Fz: [%f]\n qx: [%f]  qy: [%f] qz: [%f] qw: [%f]\n ",
+            position_error.x, position_error.y, position_error.z,ctl_input.force.x,ctl_input.force.y,ctl_input.force.z , q_e.getX()*q_e.getX(),q_e.getY()*q_e.getY(),q_e.getZ()*q_e.getZ(),q_e.getW());
+            
+        }
+        
+         else{  
+               ROS_INFO(" Status:\n ex: [%f] ey: [%f] ez: [%f] \n Fx: [%f] Fy: [%f] Fz: [%f] \n qx: [%f]  qy: [%f] qz: [%f] qw: [%f]\n ",
+            position_error.x, position_error.y, position_error.z,ctl_input.force.x,ctl_input.force.y,ctl_input.force.z , q_e.getX()*q_e.getX(),q_e.getY()*q_e.getY(),q_e.getZ()*q_e.getZ(),q_e.getW());
+            
+
+        /* ROS_INFO(" Deploying MPC for transverse motion  ex: [%f]  ey: [%f] ez: [%f]\n Fx: [%f] Fy: [%f] Fz: [%f] ",
+            position_error.x, position_error.y, position_error.z,ctl_input.force.x,ctl_input.force.y,ctl_input.force.z);
+           
+        ROS_INFO("qx: [%f]  qy: [%f] qz: [%f] qw: [%f]", q_e.getX()*q_e.getX(),q_e.getY()*q_e.getY(),q_e.getZ()*q_e.getZ(),q_e.getW());
+          */
+         }
+
+}
 
 
 /************************************************************************/
@@ -74,11 +100,11 @@ void SecondaryNodelet::RunTest1(ros::NodeHandle *nh){
     /* RATTLE test: hand off control to RATTLE coordinator
     */
     ROS_INFO("Test 2 -- Worst Estimate -- MPC");
-//Estimate_status="Worst";
+Estimate_status="none";
 RunTest0(nh);
 secondary_status_.control_mode = "regulate";
     ros::Duration(0.4).sleep(); // make sure controller gets the regulate settings before disabling default controller.
-    NODELET_DEBUG_STREAM("[PRIMARY COORD]: Disabling default controller...");
+    NODELET_DEBUG_STREAM("[SECONDARY_COORD]: Disabling default controller...");
     disable_default_ctl();
  ROS_INFO("Initiating the Quaternion Feedback Controller");
     ros::Rate loop_rate(62.5);
@@ -114,28 +140,8 @@ secondary_status_.control_mode = "regulate";
        
          
          if(t==60){ 
-         if(sqrt(ex*ex+ey*ey+ez*ez)<0.01)
-            {
-            ROS_INFO(" ---------------------------------------Goal Position arrived--------------------------------");
-            ROS_INFO(" Deploying MPC for transverse motion  ref_x: [%f]  ref_y: [%f] ref_z: [%f]\n pose_x: [%f] pose_y: [%f] Pose_z: [%f] \n ",
-            pos_ref2.x, pos_ref2.y, pos_ref2.z,position_.x,position_.y,position_.z);
-
-            ROS_INFO(" Deploying MPC for transverse motion  ex: [%f]  ey: [%f] ez: [%f]\n Fx: [%f] Fy: [%f] Fz: [%f] \n",
-            position_error_2.x, position_error_2.y, position_error_2.z,x0[0],x0[1],x0[2]);
-          
-            // ROS_INFO(" Deploying MPC for transverse motion  ex: [%f]  ey: [%f] ez: [%f]\n Fx: [%f] Fy: [%f] Fz: [%f] \n",
-            // position_error_2.x, position_error_2.y, position_error_2.z,ctl_input.force.x,ctl_input.force.y,ctl_input.force.z);
-          
-          
-        }
-         else{  
-        ROS_INFO(" Deploying MPC for transverse motion\nex: [%f]  ey: [%f] ez: [%f]\n Fx: [%f] Fy: [%f] Fz: [%f] ",
-            position_error_2.x, position_error_2.y, position_error_2.z,ctl_input.force.x,ctl_input.force.y,ctl_input.force.z);
-           
-        ROS_INFO("\n qx: [%f]  qy: [%f] qz: [%f] qw: [%f]", q_e.getX()*q_e.getX(),q_e.getY()*q_e.getY(),q_e.getZ()*q_e.getZ(),q_e.getW());
-        ROS_INFO(" \n ref_x: [%f]  ref_y: [%f] ref_z: [%f]\n pose_x: [%f] pose_y: [%f] Pose_z: [%f] \n ",
-            pos_ref2.x, pos_ref2.y, pos_ref2.z,position_.x,position_.y,position_.z);
-         }
+            std::cout << "[SECONDARY_COORD] DMPC executed" << std::endl;
+            PrintStatus();
          t=0;
          }
 
